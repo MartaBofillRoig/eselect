@@ -5,8 +5,13 @@
 # Simulation study 
 ##################################################################################
 
-setwd("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection")
-source('C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions.R')
+setwd("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection")
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions.R')
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ce.R')
+
+# setwd("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection")
+# source('C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions.R')
+# source('C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ce.R')
 
 #########################################
 # Preamble
@@ -56,11 +61,13 @@ dataset = rbind(scenarios,scenarios1,scenarios2,scenarios3)
 # Calculate CE Probabilities
 dataset$p0_ce = mapply(prob_cbe, p_e1=dataset$p0_e1, p_e2=dataset$p0_e2, rho=dataset$corr)
 dataset$p1_ce = mapply(prob_cbe, p_e1=dataset$p1_e1, p_e2=dataset$p1_e2, rho=dataset$corr) 
+dataset$OR_ce = (dataset$p1_ce/(1-dataset$p1_ce))/(dataset$p0_ce/(1-dataset$p0_ce))
 
 # Calculate ARE
 dataset$ARE = mapply(ARE_cbe, p0_e1=dataset$p0_e1, p0_e2=dataset$p0_e2, eff_e1=dataset$OR1, eff_e2=dataset$OR2, rho=dataset$corr)
-
 dataset$decision = ifelse(dataset$ARE<1, "RE", "CE")
+
+rm(OR1,OR2,p0_ce,p0_e1,p0_e2,scenarios,scenarios1,scenarios2,scenarios3)
 
 #########################################
 # Simulations
@@ -79,11 +86,14 @@ alpha=0.025; beta=0.2
 z.alpha <- qnorm(1-alpha,0,1)  
 z.beta <-  qnorm(1-beta,0,1) 
 
-#########################################
+
 t0=Sys.time()
 
 dataset$Test_Reject_CE = 0
 dataset$Test_Reject_RE = 0
+dataset$Test_Reject_SEL = 0 
+
+#########################################
 
 for(i in 1:dim(dataset)[1]){
   dataset$Test_Reject_CE[i] <- sum(replicate(nsim,f_OR(n0,dataset$p0_ce[i],dataset$p1_ce[i]))< - z.alpha)/nsim
@@ -91,9 +101,17 @@ for(i in 1:dim(dataset)[1]){
   print(i)
 }
 
-t1=Sys.time()-t0 
-rm(alpha,beta,i,nsim,z.alpha,z.beta,OR1,OR2,p0_ce,p0_e1,p0_e2,f_OR,scenarios,scenarios1,scenarios2,scenarios3)
 save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results.RData")
+
+######################################### 
+
+for(i in 1:dim(dataset)[1]){ 
+  dataset$Test_Reject_SEL[i] <- sum(replicate(nsim,f_ES(samplesize=2*n0,p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i],upp=dataset$max_corr[i],low=dataset$min_corr[i]))< - z.alpha)/nsim
+  print(i)
+}
+
+t1=Sys.time()-t0   
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision.RData")
 
 #########################################
 # Results

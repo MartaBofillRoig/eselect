@@ -1,92 +1,104 @@
 
 
-# 2x2 Table of probabilities
-s1_group0 = phi_group0
-s2_group0 = p1_group0 - phi_group0
-s3_group0 = p2_group0 - phi_group0
-s4_group0 = 1 - s1_group0 - s2_group0 - s3_group0
-
-  
-
 ##############################################################  
-i=1
-p0_e1 = dataset$p0_e1[i]
-p1_e1 = dataset$p1_e1[i]
-p0_e2 = dataset$p0_e2[i]
-p1_e2 = dataset$p1_e2[i]
-p0_ce = dataset$p0_ce[i]
-p1_ce = dataset$p1_ce[i]
-samplesize=500
-# dataset$corr[i]
 
-
-
-s1_group0 = p0_e1+p0_e2-p0_ce
-s2_group0 = p0_e1 - (p0_e1+p0_e2-p0_ce)
-s3_group0 = p0_e2 - (p0_e1+p0_e2-p0_ce)
-s4_group0 = 1 - s1_group0 - s2_group0 - s3_group0
-
-sm = rmultinom(1,500,c(s1_group0,s2_group0,s3_group0,s4_group0))
-corr_est =(sm[1]*sm[4]-(sm[2]*sm[3]))/sqrt((sm[1]+sm[3])*(sm[2]+sm[4])*(sm[1]+sm[2])*(sm[3]+sm[4]))
-(corr_est)
+OR_function<- function(p0, p1){
+  
+  OR<- (p1/(1-p1))/(p0/(1-p0))
+  return(OR)
+}
 
 ##############################################################  
 
-f_ES <- function(samplesize,p0_e1,p1_e1,p0_e2,p1_e2,p0_ce,p1_ce){
+fun_p0 <- function(p,l){
   
-  rmultinom(2,500,c(0.75,0.25))
+  p = p*2
   
-  # CONTROL GROUP
-  # Endpoint 1
-  R = runif(samplesize)
-  X1_0 = sum(R<p0_e1 & R>0)
-  # phat_group0 = X1_0/samplesize
+  sol1= -(1 + l + p - l*p + sqrt(4*(-1 + l)*p + (1 + l + p - l*p)^2))/(2*(-1 + l))
+  sol2= -(1 + l + p - l*p - sqrt(4*(-1 + l)*p + (1 + l + p - l*p)^2))/(2*(-1 + l))
   
-  # Endpoint 2
-  R = runif(X1_0)
-  p_aux=(p0_e1+p0_e2-p0_ce)/p0_e1
-  X21_0 = sum(R<p_aux & R>0)
-  # phat_group0 = X21_0/samplesize
+  if(sol2>0 & sol2<1){
+    p0=sol2
+  }else{
+    p0=sol1
+  }
   
-  R = runif(samplesize-X1_0)
-  p_aux=(p0_ce-p0_e1)/(1-p0_e1)
-  X20_0 = sum(R<p_aux & R>0)
-  # phat_group0 = X20_0/samplesize
+  return(p0)  
+}
+
+# p=p1_e1+p0_e1
+# l=OR1
+# fun_p0(p=p,l=l)
+
+##############################################################  
+
+f_ES <- function(samplesize,p0_e1,p1_e1,p0_e2,p1_e2,p0_ce,p1_ce,upp,low){ 
+  ss=samplesize/2
   
-  # INTERVENTION GROUP
-  # Endpoint 1
-  R = runif(samplesize)
-  X1_1 = sum(R<p1_e1 & R>0)
-  # phat_group0 = X1_1/samplesize
+  # control group
+  s1_group0 = p0_e1 + p0_e2 - p0_ce
+  s2_group0 = p0_ce-p0_e2  
+  s3_group0 = p0_ce-p0_e1  
+  s4_group0 = 1- p0_ce  
   
-  # Endpoint 2
-  R = runif(X1_1)
-  p_aux=(p1_e1+p1_e2-p1_ce)/p1_e1
-  X21_1 = sum(R<p_aux & R>0)
-  # phat_group0 = X21_1/samplesize
+  sm0 = rmultinom(1,ss,c(s1_group0,s2_group0,s3_group0,s4_group0)) 
   
-  R = runif(samplesize-X1_1)
-  p_aux=(p1_ce-p1_e1)/(1-p1_e1)
-  X20_1 = sum(R<p_aux & R>0)
-  # phat_group0 = X20_1/samplesize
+  # intervention group
+  s1_group1 = p1_e1+p1_e2-p1_ce
+  s2_group1 = ifelse(p1_ce-p1_e2>0, p1_ce-p1_e2, 0)  
+  s3_group1 = ifelse(p1_ce-p1_e1>0, p1_ce-p1_e1, 0)   
+  s4_group1 = 1- p1_ce  
   
-  X1 = c(rep(1,X1_0),rep(0,samplesize-X1_0),rep(1,X1_1),rep(0,samplesize-X1_1))
-  X2 = c(rep(1,X21_0),rep(1,X20_0),rep(0,samplesize-X21_0-X20_0),rep(1,X21_1),rep(1,X20_1),rep(0,samplesize-X21_1-X20_1))
+  sm1 = rmultinom(1,ss,c(s1_group1,s2_group1,s3_group1,s4_group1))
   
-  # cor(X1,X2)
+  # pooled sample
+  sm = sm0 + sm1
   
-  sum(X1)/samplesize
-  sum(X2)/samplesize
+  phat_e1 = (sm[1]+sm[2])/samplesize
+  phat_e2 = (sm[1]+sm[3])/samplesize
+  phat_ce = 1-(sm[4])/samplesize
   
+  OR1 = OR_function(p0_e1,p1_e1)
+  OR2 = OR_function(p0_e2,p1_e2)
+  OR_ce = OR_function(p0_ce,p1_ce)
+    
+  phat0_e1 = fun_p0(p=phat_e1,l=OR1)
+  phat0_e2 = fun_p0(p=phat_e2,l=OR2)
+  phat0_ce = fun_p0(p=phat_ce,l=OR_ce)
   
+  corrhat = ((phat0_e1+phat0_e2-phat0_ce)-phat0_e1*phat0_e2)/sqrt(phat0_e1*(1-phat0_e1)*phat0_e2*(1-phat0_e2))
   
-  # X1 = c(rep(1,X1_0),rep(0,samplesize-X1_0))
-  # X2 = c(rep(1,X21_0),rep(1,X20_0),rep(0,samplesize-X21_0-X20_0))
+  update_uppcorr0=upper_corr(phat0_e1,phat0_e2)
+  update_uppcorr1=upper_corr((OR1*phat0_e1/(1-phat0_e1))/(1+(OR1*phat0_e1/(1-phat0_e1))),(OR2*phat0_e2/(1-phat0_e2))/(1+(OR2*phat0_e2/(1-phat0_e2))))
+    
+  update_lowcorr0= lower_corr(phat0_e1,phat0_e2)  
+  update_lowcorr1=lower_corr((OR1*phat0_e1/(1-phat0_e1))/(1+(OR1*phat0_e1/(1-phat0_e1))),(OR2*phat0_e2/(1-phat0_e2))/(1+(OR2*phat0_e2/(1-phat0_e2))))
   
+  corrhat_c = corrhat
+  if(corrhat > upp || corrhat > update_uppcorr0 || corrhat > update_uppcorr1){
+    corrhat_c = min(upp,upper_corr(phat0_e1,phat0_e2))
+  }
+  if(corrhat < low || corrhat < update_lowcorr0 || corrhat < update_lowcorr1){
+    corrhat_c = max(low,lower_corr(phat0_e1,phat0_e2),lower_corr((OR1*phat0_e1/(1-phat0_e1))/(1+(OR1*phat0_e1/(1-phat0_e1))),(OR2*phat0_e2/(1-phat0_e2))/(1+(OR2*phat0_e2/(1-phat0_e2)))))
+  } 
   
+  # decision based on blinded data
+  ARE_up = ARE_cbe(p0_e1=phat0_e1, p0_e2=phat0_e2, eff_e1=OR1, eff_e2=OR2, rho=corrhat_c) 
+  # p0_e1=phat0_e1; p0_e2=phat0_e2; eff_e1=OR1; eff_e2=OR2; rho=corrhat_c
   
-  # test odds ratio
-  TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/samplesize)^(-1/2)
+  if(ARE_up>= 1){
+    phat_group1 = 1-(sm1[4])/ss
+    phat_group0 = 1-(sm0[4])/ss
+    
+    # test odds ratio RE
+    TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/ss)^(-1/2)
+  }else{
+    phat_group1 = (sm1[1]+sm1[2])/ss
+    phat_group0 = (sm0[1]+sm0[2])/ss
+    
+    # test odds ratio RE
+    TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/ss)^(-1/2)
+  }
   
   return(TestOR_unpooled)
 }
