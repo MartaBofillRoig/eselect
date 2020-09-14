@@ -32,7 +32,7 @@ fun_p0 <- function(p,l){
 
 ##############################################################  
 
-f_ES <- function(samplesize,p0_e1,p1_e1,p0_e2,p1_e2,p0_ce,p1_ce,upp,low){ 
+f_ES <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,OR_ce,upp,low){ 
   ss=samplesize/2
   
   # control group
@@ -58,9 +58,9 @@ f_ES <- function(samplesize,p0_e1,p1_e1,p0_e2,p1_e2,p0_ce,p1_ce,upp,low){
   phat_e2 = (sm[1]+sm[3])/samplesize
   phat_ce = 1-(sm[4])/samplesize
   
-  OR1 = OR_function(p0_e1,p1_e1)
-  OR2 = OR_function(p0_e2,p1_e2)
-  OR_ce = OR_function(p0_ce,p1_ce)
+  # OR1 = OR_function(p0_e1,p1_e1)
+  # OR2 = OR_function(p0_e2,p1_e2)
+  # OR_ce = OR_function(p0_ce,p1_ce)
     
   phat0_e1 = fun_p0(p=phat_e1,l=OR1)
   phat0_e2 = fun_p0(p=phat_e2,l=OR2)

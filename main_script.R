@@ -102,18 +102,27 @@ for(i in 1:dim(dataset)[1]){
   print(i)
 }
 
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results.RData")
+save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results.RData")
 
 ######################################### 
 
 for(i in 1:dim(dataset)[1]){ 
-  dataset$Test_Power_ES[i] <- sum(replicate(nsim,f_ES(samplesize=2*n0,p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i],upp=dataset$max_corr[i],low=dataset$min_corr[i]))< - z.alpha)/nsim
+  dataset$Test_Power_ES[i] <- tryCatch(sum(replicate(nsim,
+                                            f_ES(samplesize=2*n0,
+                                                 p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                                 OR1=dataset$OR1[i],
+                                                 p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                                 OR2=dataset$OR2[i],
+                                                 p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i],
+                                                 OR_ce=dataset$OR_ce[i],
+                                                 upp=dataset$max_corr[i],low=dataset$min_corr[i]))< - z.alpha)/nsim,
+                                       error=function(e){NA})
   print(i)
 }
 
 t1=Sys.time()-t0   
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision.RData")
-
+save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_decision.RData")
+# save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision.RData")
 
 
 #########################################
@@ -124,28 +133,29 @@ for(i in 1:dim(dataset)[1]){
   print(i)
 }
 
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_H0.RData")
+save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0.RData")
 
 ######################################### 
 
 for(i in 1:dim(dataset)[1]){ 
-  dataset$Test_Reject_ES[i] <- sum(replicate(nsim,f_ES(samplesize=2*n0,p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i],upp=dataset$max_corr[i],low=dataset$min_corr[i]))< - z.alpha)/nsim
+  dataset$Test_Reject_ES[i] <- tryCatch(sum(replicate(nsim,
+                                             f_ES(samplesize=2*n0,
+                                                  p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+                                                  OR1=dataset$OR1[i],
+                                                  p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+                                                  OR2=dataset$OR2[i],
+                                                  p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i],
+                                                  OR_ce=dataset$OR_ce[i],
+                                                  upp=dataset$max_corr[i],low=dataset$min_corr[i]))< - z.alpha)/nsim,
+                                        error=function(e){NA})
   print(i)
 }
 
 t1=Sys.time()-t0   
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision_H0.RData")
+save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_decision_H0.RData")
+# save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision_H0.RData")
 
 
+######################################### 
+######################################### 
 
-
-#########################################
-# Results
-#########################################
-
-dataset$diff_powers = dataset$Test_Power_CE - dataset$Test_Power_RE
-dataset$gain_power = ifelse(dataset$diff_powers>0, "CE", "RE")
-
-summary(dataset)
-
-(dataset$gain_power == dataset$decision)
