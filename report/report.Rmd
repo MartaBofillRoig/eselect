@@ -123,7 +123,8 @@ summary(subset(dataset,dataset$gain_power != dataset$decision)[,c(19,20,21,26,27
 
 ### Case (1c) 
 
-```{r}
+The following figure illustrates the empirical power obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (ES). 
+```{r, warning=F}
 power_data <- data.frame(Power=c(dataset$Test_Power_ES,dataset$Test_Power_CE,dataset$Test_Power_RE),
            Endpoint=c(rep("ES",length(dataset$Test_Power_ES)),rep("CE",length(dataset$Test_Power_CE)),rep("RE",length(dataset$Test_Power_RE)))
            )
@@ -133,7 +134,9 @@ ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot()
 
 ### Cases (2a), (2b), and (2c) 
 
-```{r}
+
+The following boxplots show the significance level obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (ES). 
+```{r, warning=F}
 signlevel_data <- data.frame(signlevel=c(dataset$Test_Reject_ES,dataset$Test_Reject_CE,dataset$Test_Reject_RE),
            Endpoint=c(rep("ES",length(dataset$Test_Power_ES)),rep("CE",length(dataset$Test_Power_CE)),rep("RE",length(dataset$Test_Power_RE)))
            )
@@ -152,7 +155,7 @@ Conclusions:
 
 Open questions:
 
-  - Which are the input parameters anticipated for the design of the trial?
+  - Which are the input parameters anticipated for the design of the trial? ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$) or ($p_1^{(0)},p_*^{(0)},OR_1,OR_*$)?
   - Review assumptions correlation bounds
 
 Future steps: 
@@ -163,6 +166,7 @@ Future steps:
 
 ## Additional figures
 
+For each scenario, we plot how the difference in power behaves according to the correlation.
 ```{r}
 p <- list()
 for(i in 1:max(dataset$scenario)){ 
