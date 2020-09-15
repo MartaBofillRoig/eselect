@@ -18,9 +18,6 @@ load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_
 knitr::opts_chunk$set(echo = TRUE) 
 ```
 
-<!-- ## Goals -->
-
-
 ## Design and main assumptions
 
 We simulate a two-arm trial with two binary endpoints according to the following parameters:
@@ -101,9 +98,7 @@ In what follows we compare the statistical powers obtained using the composite e
 <!-- decision between using the composite endpoint or the endpoint 1  -->
 -according to the ARE value- and the difference in powers obtained in the simulation.  In this case, we calculate the ARE at the beginning of the study, and then according to the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$).
 
-```{r}
-# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_H0.RData")
-# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision_H0.RData")
+```{r} 
 dataset$diff_powers = dataset$Test_Power_CE - dataset$Test_Power_RE 
 ```
 
@@ -118,15 +113,15 @@ dataset$gain_power = ifelse(dataset$diff_powers>0, "CE", "RE")
 dataset$gain_power = as.factor(dataset$gain_power)
 dataset$decision = as.factor(dataset$decision)
 
-summary(subset(dataset,dataset$gain_power != dataset$decision)[,c(19,20,21,26,27)])
+summary(subset(dataset,dataset$gain_power != dataset$decision)[,c(18,19,20,21,26)])
 ```
 
 ### Case (1c) 
 
-The following figure illustrates the empirical power obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (ES). 
+The following figure illustrates the empirical power obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (SE). 
 ```{r, warning=F}
 power_data <- data.frame(Power=c(dataset$Test_Power_ES,dataset$Test_Power_CE,dataset$Test_Power_RE),
-           Endpoint=c(rep("ES",length(dataset$Test_Power_ES)),rep("CE",length(dataset$Test_Power_CE)),rep("RE",length(dataset$Test_Power_RE)))
+           Endpoint=c(rep("SE",length(dataset$Test_Power_ES)),rep("CE",length(dataset$Test_Power_CE)),rep("RE",length(dataset$Test_Power_RE)))
            )
 
 ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot() 
@@ -135,10 +130,10 @@ ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot()
 ### Cases (2a), (2b), and (2c) 
 
 
-The following boxplots show the significance level obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (ES). 
+The following boxplots show the significance level obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (SE). 
 ```{r, warning=F}
 signlevel_data <- data.frame(signlevel=c(dataset$Test_Reject_ES,dataset$Test_Reject_CE,dataset$Test_Reject_RE),
-           Endpoint=c(rep("ES",length(dataset$Test_Power_ES)),rep("CE",length(dataset$Test_Power_CE)),rep("RE",length(dataset$Test_Power_RE)))
+           Endpoint=c(rep("SE",length(dataset$Test_Power_ES)),rep("CE",length(dataset$Test_Power_CE)),rep("RE",length(dataset$Test_Power_RE)))
            )
 
 ggplot(signlevel_data, aes(x=Endpoint, y=signlevel)) + geom_boxplot()
@@ -150,12 +145,12 @@ ggplot(signlevel_data, aes(x=Endpoint, y=signlevel)) + geom_boxplot()
 
 Conclusions:
 
-  - The powers using the selected endpoint are larger than using the composite endpoint and the relevant endpoint.
+  - The powers using the selected endpoint are larger than the ones obtained using the composite endpoint and the relevant endpoint.
   - The significance level is similar in the three situations.
 
 Open questions:
 
-  - Which are the input parameters anticipated for the design of the trial? ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$) or ($p_1^{(0)},p_*^{(0)},OR_1,OR_*$)?
+  - Which are the input parameters anticipated for the design of the trial? ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$) or ($p_1^{(0)},p_2^{(0)},p_*^{(0)},OR_1,OR_2$)?
   - Review assumptions correlation bounds
 
 Future steps: 
@@ -164,16 +159,16 @@ Future steps:
   - Next step: to consider an interim stage to estimate the probabilities under the control group and the correlation.
 
 
-## Additional figures
+<!-- ## Additional figures -->
 
-For each scenario, we plot how the difference in power behaves according to the correlation.
-```{r}
-p <- list()
-for(i in 1:max(dataset$scenario)){ 
-  sub=subset(dataset,dataset$scenario==i)
-  p[[i]] <-ggplot(sub, aes(x=corr, y=diff_powers, color=as.factor(decision)))  +
-    geom_point(size=2) + labs(y = "Power difference", x="Correlation", color="Decision") + coord_cartesian(ylim = c(-0.25, 0.75))
-} 
-marrangeGrob(p,ncol=2,nrow=2) 
-```
+<!-- For each scenario, we plot how the difference in power behaves according to the correlation. -->
+<!-- ```{r} -->
+<!-- p <- list() -->
+<!-- for(i in 1:max(dataset$scenario)){  -->
+<!--   sub=subset(dataset,dataset$scenario==i) -->
+<!--   p[[i]] <-ggplot(sub, aes(x=corr, y=diff_powers, color=as.factor(decision)))  + -->
+<!--     geom_point(size=2) + labs(y = "Power difference", x="Correlation", color="Decision") + coord_cartesian(ylim = c(-0.25, 0.75)) -->
+<!-- }  -->
+<!-- marrangeGrob(p,ncol=2,nrow=2)  -->
+<!-- ``` -->
 
