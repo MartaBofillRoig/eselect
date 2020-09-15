@@ -155,7 +155,42 @@ t1=Sys.time()-t0
 save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_decision_H0.RData")
 # save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision_H0.RData")
 
+######################################### 
+######################################### 
+# type i assuming alpha=0.05
+alpha=0.05 
+z.alpha <- qnorm(1-alpha,0,1)  
+
+dataset$Test_Reject_CE05 = 0
+dataset$Test_Reject_RE05 = 0
+dataset$Test_Reject_ES05 = 0 
+
+
+#########################################
+
+for(i in 1:dim(dataset)[1]){
+  dataset$Test_Reject_CE05[i] <- sum(replicate(nsim,f_OR(n0,dataset$p0_ce[i],dataset$p0_ce[i]))< - z.alpha)/nsim
+  dataset$Test_Reject_RE05[i] <- sum(replicate(nsim,f_OR(n0,dataset$p0_e1[i],dataset$p0_e1[i]))< - z.alpha)/nsim
+  print(i)
+}
 
 ######################################### 
-######################################### 
+
+for(i in 1:dim(dataset)[1]){ 
+  dataset$Test_Reject_ES05[i] <- tryCatch(sum(replicate(nsim,
+                                                      f_ES(samplesize=2*n0,
+                                                           p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+                                                           OR1=dataset$OR1[i],
+                                                           p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+                                                           OR2=dataset$OR2[i],
+                                                           p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i],
+                                                           OR_ce=dataset$OR_ce[i],
+                                                           upp=dataset$max_corr[i],low=dataset$min_corr[i]))< - z.alpha)/nsim,
+                                        error=function(e){NA})
+  print(i)
+}
+
+t1=Sys.time()-t0   
+# save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_decision_H0_05.RData")
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision_H0_05.RData")
 
