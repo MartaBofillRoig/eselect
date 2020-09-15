@@ -33,7 +33,7 @@ The correlation between the endpoints is assumed to be equal for both groups. We
 We consider the composite binary endpoint formed by endpoints 1 and 2. 
 Based on the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$), we compute:
 
-  - Probability composite endpoint control group;
+  - Probability composite endpoint control group ($p_*^{(0)}$);
   - Odds ratio composite endpoint ($OR_*$);
   
   
@@ -118,7 +118,7 @@ summary(subset(dataset,dataset$gain_power != dataset$decision)[,c(18,19,20,21,26
 
 ### Case (1c) 
 
-The following figure illustrates the empirical power obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (SE). 
+The following figure illustrates the empirical power we obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (SE). 
 ```{r, warning=F}
 power_data <- data.frame(Power=c(dataset$Test_Power_ES,dataset$Test_Power_CE,dataset$Test_Power_RE),
            Endpoint=c(rep("SE",length(dataset$Test_Power_ES)),rep("CE",length(dataset$Test_Power_CE)),rep("RE",length(dataset$Test_Power_RE)))
@@ -126,6 +126,16 @@ power_data <- data.frame(Power=c(dataset$Test_Power_ES,dataset$Test_Power_CE,dat
 
 ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot() 
 ```
+
+We compare the maximum between the power using the composite endpoint and the maximum using the relevant endpoint with the power obtained using the selected endpoint.
+
+```{r warning=FALSE}
+
+dataset$diff_es = ifelse(dataset$gain_power=="CE", dataset$Test_Power_ES-dataset$Test_Power_CE,dataset$Test_Power_ES-dataset$Test_Power_RE)
+summary(dataset$diff_es)
+```
+
+
 
 ### Cases (2a), (2b), and (2c) 
 
