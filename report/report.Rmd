@@ -1,5 +1,5 @@
 ---
-title: "Summary simulation results."
+title: "Summary simulation results"
 author: ""
 date: "`r Sys.Date()`"
 output: 
@@ -14,9 +14,16 @@ library(gridExtra)
 library(ggpubr)
 
 load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_decision_H0.RData")
-
 knitr::opts_chunk$set(echo = TRUE) 
+
 ```
+
+## Summary
+
+Main modifications with respect to previous versions:
+
+  - The scenarios considered for the simulation study are a subset of the previous version. *CHECK*
+
 
 ## Design and main assumptions
 
@@ -28,7 +35,7 @@ We simulate a two-arm trial with two binary endpoints according to the following
   - Odds ratio endpoint 2 ($OR_2$): $0.65, 0.7, 0.8$;
   - Correlation between endpoints ($\rho$): $0, 0.2, 0.4, 0.6, 0.8$.  
 
-The correlation between the endpoints is assumed to be equal for both groups. We note that since the correlation is bounded between two values defined by ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$), not all the combinations of  ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$)  are possible. We calculate the correlation bounds for each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and discard those scenarios in which the correlation is not within the valid range. The total number of scenarios is $297$.
+The correlation between the endpoints is assumed to be equal for both groups. We note that since the correlation is bounded between two values defined by ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$), not all the combinations of  ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$)  are possible. We calculate the correlation bounds for each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and discard those scenarios in which the correlation is not within the valid range. The total number of scenarios is $xxxxxx$.
 
 We consider the composite binary endpoint formed by endpoints 1 and 2. 
 Based on the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$), we compute:
@@ -43,8 +50,10 @@ We consider the Asymptotic Relative Efficiency (ARE) method to quantify the effi
   - ARE value;
   - ARE Decision: *CE*, if the composite endpoint is preferred; *RE*, if the endpoint 1 is preferred.
 
-The sample size is assumed to be equal for both groups $n^{(0)} = n^{(1)} = 500$, and the  significance level is 
-$\alpha=0.025$.
+
+We calculate the sample size to have $0.70$ power to detect an effect of $OR_1$ on the endpoint 1 at significance level $\alpha = 0.05$.
+
+<!-- The sample size is assumed to be equal for both groups $n^{(0)} = n^{(1)} = 500$, and the  significance level is $\alpha=0.025$. -->
 
 ## Cases under study
 
@@ -169,16 +178,27 @@ Future steps:
   - Next step: to consider an interim stage to estimate the probabilities under the control group and the correlation.
 
 
-<!-- ## Additional figures -->
+## Additional figures
 
-<!-- For each scenario, we plot how the difference in power behaves according to the correlation. -->
-<!-- ```{r} -->
-<!-- p <- list() -->
-<!-- for(i in 1:max(dataset$scenario)){  -->
-<!--   sub=subset(dataset,dataset$scenario==i) -->
-<!--   p[[i]] <-ggplot(sub, aes(x=corr, y=diff_powers, color=as.factor(decision)))  + -->
-<!--     geom_point(size=2) + labs(y = "Power difference", x="Correlation", color="Decision") + coord_cartesian(ylim = c(-0.25, 0.75)) -->
-<!-- }  -->
-<!-- marrangeGrob(p,ncol=2,nrow=2)  -->
-<!-- ``` -->
+For each scenario, we plot how the difference in power behaves according to the correlation.
+```{r}
+p <- list()
+for(i in 1:max(dataset$scenario)){
+  sub=subset(dataset,dataset$scenario==i)
+  p[[i]] <-ggplot(sub, aes(x=corr, y=diff_powers, color=as.factor(decision)))  +
+    geom_point(size=2) + labs(y = "Power difference", x="Correlation", color="Decision") + coord_cartesian(ylim = c(-0.25, 0.75))
+}
+marrangeGrob(p,ncol=2,nrow=2)
+```
+
+```{r}
+p <- list()
+for(i in 1:max(dataset$scenario)){
+  sub=subset(dataset,dataset$scenario==i)
+  p[[i]] <-ggplot(sub, aes(x=corr, y=ARE, color=as.factor(decision)))  +
+    geom_point(size=2) + labs(y = "ARE", x="Correlation", color="Decision") + coord_cartesian(ylim = c(-0, 5))
+}
+marrangeGrob(p,ncol=2,nrow=2)
+```
+
 
