@@ -8,13 +8,11 @@
 rm(list = ls())
 
 # setwd("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection")
-# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/Functions.R')
-# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions.R')
+# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/Functions.R') 
 # source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ce.R')
 
 setwd("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection")
-source('C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/Functions.R')
-source('C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions.R')
+source('C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/Functions.R') 
 source('C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ce.R')
 
 ##################################################################################
@@ -79,8 +77,9 @@ dataset$decision = ifelse(dataset$ARE<1, "RE", "CE")
 
 # Calculate Sample size (total sample size, n=2*n0=2*n1)
 alpha=0.05; beta=0.2
-dataset$samplesize_e1 = mapply(samplesize_OR,p0=dataset$p0_e1, OR=dataset$OR1, alpha=alpha, beta=beta)
-# dataset$samplesize_e1 = samplesize_OR(p0=dataset$p0_e1, OR=dataset$OR1, alpha=alpha, beta=beta)
+dataset$samplesize_e1 = mapply(samplesize_OR,p0=dataset$p0_e1, OR=dataset$OR1, alpha=alpha, beta=beta) 
+
+# clean
 rm(OR1,OR2,p0_e1,p0_e2,corr,scenarios)
 
 # Vector empirical powers and significance level
@@ -135,24 +134,8 @@ for(i in 1:dim(dataset)[1]){
   dataset$decision_ES[i]<- 1-aux[2]
   print(i)
 }
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_False.RData")
 
-
-windows()
-p <- list()
-q <- list()
-it = 1 
-for(i in 1:2){
-  sub=subset(dataset,dataset$scenario==i)
-  p[[it]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
-    geom_point(size=2) + labs(y = "Test_Power_ES", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
-  p[[it+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE, color=as.factor(decision)))  +
-    geom_point(size=2) + labs(y = "Test_Power_CE", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
-  p[[it+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE, color=as.factor(decision)))  +
-    geom_point(size=2) + labs(y = "Test_Power_RE", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
-  it=it+3
-}
-marrangeGrob(p,ncol=3,nrow=1)  
- 
 #########################################
 
 for(i in 1:dim(dataset)[1]){
@@ -160,7 +143,7 @@ for(i in 1:dim(dataset)[1]){
   dataset$Test_Reject_RE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_e1[i]/2,dataset$p0_e1[i],dataset$p0_e1[i]))< - z.alpha)/nsim
   print(i)
 }
-# save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0.RData")
+
 
 #########################################  
 
@@ -178,9 +161,25 @@ for(i in 1:dim(dataset)[1]){
 }
 
 t1=Sys.time()-t0   
-# save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_decision_H0.RData")
-# save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results_decision_H0.RData")
+
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
 
 ######################################### 
 #########################################  
+# results
 
+windows()
+p <- list()
+q <- list()
+it = 1 
+for(i in 1:2){
+  sub=subset(dataset,dataset$scenario==i)
+  p[[it]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
+    geom_point(size=2) + labs(y = "Test_Power_ES", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
+  p[[it+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE, color=as.factor(decision)))  +
+    geom_point(size=2) + labs(y = "Test_Power_CE", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
+  p[[it+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE, color=as.factor(decision)))  +
+    geom_point(size=2) + labs(y = "Test_Power_RE", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
+  it=it+3
+}
+marrangeGrob(p,ncol=3,nrow=1)  
