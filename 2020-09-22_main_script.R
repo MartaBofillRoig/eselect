@@ -86,12 +86,14 @@ rm(OR1,OR2,p0_e1,p0_e2,corr,scenarios)
 dataset$Test_Power_CE <- NA
 dataset$Test_Power_RE <- NA
 dataset$Test_Power_ES <- NA
+dataset$Test_Power_ES_ub <- NA
 dataset$decision_ES <- NA 
+dataset$decision_ES_ub <- NA 
 
 dataset$Test_Reject_CE <- NA
 dataset$Test_Reject_RE <- NA
 dataset$Test_Reject_ES <- NA
-
+dataset$Test_Reject_ES_ub <- NA
 
 #########################################
 # Simulations
@@ -120,13 +122,12 @@ for(i in 1:dim(dataset)[1]){
 #  
 
 for(i in 1:dim(dataset)[1]){
-  aux <- rowSums(replicate(nsim,f_ES2(samplesize=dataset$samplesize_e1[i]/2,
+  aux <- rowSums(replicate(nsim,eselection_b(samplesize=dataset$samplesize_e1[i]/2,
                                    p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
                                    OR1=dataset$OR1[i],
                                    p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
                                    OR2=dataset$OR2[i],
-                                   p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i], 
-                                   upp=dataset$max_corr[i],low=dataset$min_corr[i]))< c(-z.alpha,1))/nsim
+                                   p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
   
                                                        
                                          
@@ -134,9 +135,26 @@ for(i in 1:dim(dataset)[1]){
   dataset$decision_ES[i]<- 1-aux[2]
   print(i)
 }
-save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_False.RData")
 
+#  
+
+for(i in 1:dim(dataset)[1]){ 
+  aux <- rowSums(replicate(nsim,eselection_ub(samplesize=dataset$samplesize_e1[i]/2,
+                                         p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                         OR1=dataset$OR1[i],
+                                         p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                         OR2=dataset$OR2[i],
+                                         p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+                  
+  dataset$Test_Power_ES_ub[i]<- aux[1]
+  dataset$decision_ES_ub[i]<- 1-aux[2]
+  print(i)
+} 
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_False.RData") 
 #########################################
+
+
+set.seed(2314)
 
 for(i in 1:dim(dataset)[1]){
   dataset$Test_Reject_CE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_e1[i]/2,dataset$p0_ce[i],dataset$p0_ce[i]))< - z.alpha)/nsim
@@ -148,38 +166,70 @@ for(i in 1:dim(dataset)[1]){
 #########################################  
 
 for(i in 1:dim(dataset)[1]){
-  dataset$Test_Reject_ES[i] <- tryCatch(sum(replicate(nsim,
-                                             f_ES2(samplesize=dataset$samplesize_e1[i]/2,
-                                                  p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
-                                                  OR1=dataset$OR1[i],
-                                                  p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
-                                                  OR2=dataset$OR2[i],
-                                                  p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i], 
-                                                  upp=dataset$max_corr[i],low=dataset$min_corr[i])[1])< - z.alpha)/nsim,
-                                        error=function(e){NA})
+  dataset$Test_Reject_ES[i] <- sum(replicate(nsim,
+                                             eselection_b(samplesize=dataset$samplesize_e1[i]/2,
+                                                   p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+                                                   OR1=dataset$OR1[i],
+                                                   p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+                                                   OR2=dataset$OR2[i],
+                                                   p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i])[1])< - z.alpha)/nsim
+  # tryCatch(, error=function(e){NA})
   print(i)
 }
 
-t1=Sys.time()-t0   
+# 
+
+
+for(i in 1:dim(dataset)[1]){
+  dataset$Test_Reject_ES_ub[i] <- sum(replicate(nsim,
+                                                eselection_ub(samplesize=dataset$samplesize_e1[i]/2,
+                                                         p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+                                                         OR1=dataset$OR1[i],
+                                                         p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+                                                         OR2=dataset$OR2[i],
+                                                         p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i])[1])< - z.alpha)/nsim
+  print(i)
+}
+
+t1=Sys.time()-t0  
 
 save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+# save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
+
+
+
+#########################################  
 
 ######################################### 
 #########################################  
 # results
+# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
+# 
+# i=1
+# 
+# samplesize=dataset$samplesize_e1[i]/2; 
+# p0_e1=dataset$p0_e1[i];p1_e1=dataset$p1_e1[i];
+# OR1=dataset$OR1[i];
+# p0_e2=dataset$p0_e2[i];p1_e2=dataset$p1_e2[i];
+# OR2=dataset$OR2[i];
+# p0_ce=dataset$p0_ce[i];p1_ce=dataset$p1_ce[i]; 
+# # upp=dataset$max_corr[i];low=dataset$min_corr[i]
+# 
+# 
+# 
+# eselection_ub(samplesize=dataset$samplesize_e1[i]/2,
+#          p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+#          OR1=dataset$OR1[i],
+#          p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+#          OR2=dataset$OR2[i],
+#          p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i], 
+#          upp=dataset$max_corr[i],low=dataset$min_corr[i])
+# 
+# 
+# f_sim(samplesize=dataset$samplesize_e1[i]/2,
+#       p0_e1=dataset$p0_e1[i],
+#       p0_e2=dataset$p0_e2[i],
+#       p0_ce=dataset$p0_ce[i])
 
-windows()
-p <- list()
-q <- list()
-it = 1 
-for(i in 1:2){
-  sub=subset(dataset,dataset$scenario==i)
-  p[[it]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
-    geom_point(size=2) + labs(y = "Test_Power_ES", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
-  p[[it+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE, color=as.factor(decision)))  +
-    geom_point(size=2) + labs(y = "Test_Power_CE", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
-  p[[it+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE, color=as.factor(decision)))  +
-    geom_point(size=2) + labs(y = "Test_Power_RE", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.75, 1))
-  it=it+3
-}
-marrangeGrob(p,ncol=3,nrow=1)  
+
+
