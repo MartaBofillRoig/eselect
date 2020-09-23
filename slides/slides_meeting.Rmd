@@ -1,7 +1,7 @@
 ---
-title: "Untitled"
-author: "mbr"
-date: "22/09/2020"
+title: "Endpoint selection and sample size recalculation with composite binary endpoints"
+author: "Vienna-Barcelona"
+date: "`r Sys.Date()`"
 output: 
   beamer_presentation: 
     theme: "Boadilla"
