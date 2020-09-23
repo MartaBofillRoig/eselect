@@ -17,7 +17,8 @@ library(ggplot2)
 library(gridExtra)
 library(ggpubr)
 # load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
-load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
+# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
+load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
 knitr::opts_chunk$set(echo = TRUE) 
 
 ```
@@ -196,7 +197,7 @@ for(i in 1:max(dataset$scenario)){
     geom_point(size=2)+ ggtitle(paste("Scenario", dataset$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
 
   
-stable <- data.frame(Corr=sub$corr,ARE=round(sub$ARE,2),Decision=round(100*sub$decision_ES,2)) 
+stable <- data.frame(Corr=sub$corr,ARE=round(sub$ARE,2),Dec_b=round(100*sub$decision_ES,2),Dec_ub=round(100*sub$decision_ES_ub,2)) 
   p[[enum+4]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
   
   enum=enum+5 
