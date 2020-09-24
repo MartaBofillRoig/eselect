@@ -16,10 +16,9 @@ output:
 library(ggplot2)
 library(gridExtra)
 library(ggpubr)
-library(tidyverse)
-# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
-# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
-load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+library(tidyverse) 
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
 knitr::opts_chunk$set(echo = TRUE) 
 
 ```
@@ -29,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Main modifications with respect to previous versions:
 
   - The scenarios we considered for the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) are a subset of the previous version, while for the correlation  ($\rho$) we have added more values. 
-  - For the endpoint selection, We estimate the correlation at the end of the study based on two different approaches: i) using blinded data; and ii) using unblinded data. See section 2.2. for further explanation. We remark that here in contrast with the previous version, we do not use the expected effect on the composite endpoint to estimate the correlation. 
+  - For the endpoint selection, we estimate the correlation at the end of the study based on two different approaches: i) using blinded data; and ii) using unblinded data. See section 2.2. for further explanation. We remark that in contrast with the previous version, we do not use the expected effect on the composite endpoint to estimate the correlation. 
   - We have added new constraints on the possible correlation values. See section 2.3. 
   
 <!-- the probability of the composite endpoint under the control group, nor previous knowledge of the correlation. -->
@@ -102,7 +101,7 @@ We consider two different approaches for estimating the correlation between the 
 Based on the observed responses in the pooled sample, we estimate the probabilities $p_1$, $p_2$, and $p_*$, where $p_k=\pi p_k^{(0)} + (1-\pi)p_k^{(1)}$ for $k=1,2,*$  and $\pi=n^{(0)}/n$.
 Assuming the expected effects for the endpoints 1 and 2  (say $OR_1$ and $OR_2$) pre-specified in advance, we obtain estimates of the probabilities of each composite component under the control group $p_1^{(0)},p_2^{(0)}$ and subsequently the estimates of the probabilities under the  treatment group $p_1^{(1)},p_2^{(1)}$.
 
-Using the estimated probabilities for each composite component in each group ($p_1^{(0)},p_2^{(0)},p_1^{(1)},p_2^{(1)}$) and using the estimated pooled probability of the composite endpoint ($p_*$), we get an estimator of the correlation.
+Using the estimated probabilities for each composite component in each group ($p_1^{(0)},p_2^{(0)},p_1^{(1)},p_2^{(1)}$) and using the estimated pooled probability of the composite endpoint ($p_*$), we get an estimate of the correlation.
 
 We calculate the ARE by using the estimated probabilities $p_1^{(0)},p_2^{(0)}$ and the estimated correlation.
 
@@ -111,9 +110,9 @@ We calculate the ARE by using the estimated probabilities $p_1^{(0)},p_2^{(0)}$ 
 
 Based on the observed responses in patients in the control group, we estimate the probabilities $p_1^{(0)},p_2^{(0)},p_*^{(0)}$. Then, using these estimated probabilities, we obtain an estimate of the correlation between the Endpoints 1 and 2 in the control group $\rho^{(0)}$.
 
-We do the same for the treatment group, and then we obtain a estimated value for the correlation in the treatment group $\rho^{(1)}$.
+We do the same for the treatment group, and then we obtain an estimate of the correlation in the treatment group $\rho^{(1)}$.
 
-We calculate the ARE by using the estimated probabilities $p_1^{(0)},p_2^{(0)}$ and the mean of the two estimates for the correlation.
+We calculate the ARE by using the estimated probabilities $p_1^{(0)},p_2^{(0)}$ and the mean of the two estimates of the correlation.
 
 
 ## Correlation bounds
@@ -260,7 +259,7 @@ summary(dataset[,25:28])
 
 Conclusions:
 
-  - The powers using the selected endpoint (both blinded and unblinded approaches) are larger than the ones obtained using the composite endpoint and the relevant endpoint.  
+  - The powers using the selected endpoint (both blinded and unblinded approaches) are in general larger than the ones obtained using the composite endpoint and the relevant endpoint.  
   - The significance level is similar in the four situations.
 
 Open questions:
