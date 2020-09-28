@@ -176,26 +176,14 @@ eselection_b <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce)
 # computation ARE
 # computation statistic according to the decision
 
-eselection_ub <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){  
-  # for(j in 1:nsim){
+eselection_ub <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){ 
+  
   total_ss = samplesize*2
   
   # control group
-  # s1_group0 = p0_e1 + p0_e2 - p0_ce
-  # s2_group0 = p0_ce-p0_e2  
-  # s3_group0 = p0_ce-p0_e1  
-  # s4_group0 = 1- p0_ce  
-  # sm0 = rmultinom(1,samplesize,c(s1_group0,s2_group0,s3_group0,s4_group0)) 
-  
   sm0 = f_sim(samplesize=samplesize,p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
   
   # intervention group
-  # s1_group1 = p1_e1+p1_e2-p1_ce
-  # s2_group1 = ifelse(p1_ce-p1_e2>0, p1_ce-p1_e2, 0)
-  # s3_group1 = ifelse(p1_ce-p1_e1>0, p1_ce-p1_e1, 0)
-  # s4_group1 = 1- p1_ce
-  # sm1 = rmultinom(1,samplesize,c(s1_group1,s2_group1,s3_group1,s4_group1))
-  
   sm1 = f_sim(samplesize=samplesize,p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
   
   # pooled sample
@@ -244,16 +232,14 @@ eselection_ub <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce
   } 
   
   # decision based on blinded data
-  ARE_up = ARE_cbe(p0_e1=phat0_e1, p0_e2=phat0_e2, eff_e1=OR1, eff_e2=OR2, rho=corrhat_c) 
-  # } 
+  ARE_up = ARE_cbe(p0_e1=phat0_e1, p0_e2=phat0_e2, eff_e1=OR1, eff_e2=OR2, rho=corrhat_c)  
   
   if(ARE_up>= 1){
     phat_group1 = 1-(sm1[4])/samplesize
     phat_group0 = 1-(sm0[4])/samplesize
     
     # test odds ratio RE
-    TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize)
-      # log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/samplesize)^(-1/2)
+    TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
     
     Decision = 1
     
@@ -262,8 +248,7 @@ eselection_ub <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce
     phat_group0 = (sm0[1]+sm0[2])/samplesize
     
     # test odds ratio RE
-    TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize)
-    # = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/samplesize)^(-1/2)
+    TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
 
     Decision = 0
   }
@@ -301,25 +286,13 @@ f_sim <- function(samplesize,p_e1,p_e2,p_ce){
 # estimation correlation unblinded without previous info corr/CE 
 
 estimation_ub <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){  
-  # for(j in 1:nsim){
+  
   total_ss = samplesize*2
   
   # control group
-  # s1_group0 = p0_e1 + p0_e2 - p0_ce
-  # s2_group0 = p0_ce-p0_e2  
-  # s3_group0 = p0_ce-p0_e1  
-  # s4_group0 = 1- p0_ce  
-  # sm0 = rmultinom(1,samplesize,c(s1_group0,s2_group0,s3_group0,s4_group0)) 
-  
   sm0 = f_sim(samplesize=samplesize,p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
   
   # intervention group
-  # s1_group1 = p1_e1+p1_e2-p1_ce
-  # s2_group1 = ifelse(p1_ce-p1_e2>0, p1_ce-p1_e2, 0)
-  # s3_group1 = ifelse(p1_ce-p1_e1>0, p1_ce-p1_e1, 0)
-  # s4_group1 = 1- p1_ce
-  # sm1 = rmultinom(1,samplesize,c(s1_group1,s2_group1,s3_group1,s4_group1))
-  
   sm1 = f_sim(samplesize=samplesize,p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
   
   # pooled sample
