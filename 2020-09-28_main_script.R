@@ -203,60 +203,90 @@ save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/re
 ######################################### 
 #########################################  
 # results
-
+library(ggplot2)
+library(gridExtra)
+library(ggpubr)
+library(tidyverse) 
 load("C:/Users/Marta/Nextcloud/Gitkraken/CBE_selection/scenarios.RData")
 
 set.seed(42)
 
 # nsim: number of simulations
-nsim = 100000 
+nsim = 100
 
 t0=Sys.time() 
 
-corr_est_ub <- c()
-corr_est_b <- c()
+corr_est_ub <- data.frame(numeric(nsim+1))
+corr_est_b <- data.frame(numeric(nsim+1))
+
+v_ub <- c()
+v_b <- c()
 
 for(i in 1:dim(dataset)[1]){
-  corr_est_ub[i] <- mean(replicate(nsim, estimation_ub(samplesize=dataset$samplesize_e1[i]/2,
-                                                    p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
-                                                    OR1=dataset$OR1[i],
-                                                    p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
-                                                    OR2=dataset$OR2[i],
-                                                    p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1])) 
+  v_ub <- replicate(nsim, estimation_ub(samplesize=dataset$samplesize_e1[i]/2,
+                                                  p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                                  OR1=dataset$OR1[i],
+                                                  p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                                  OR2=dataset$OR2[i],
+                                                  p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1])
   
-  corr_est_b[i] <- mean(replicate(nsim, estimation_b(samplesize=dataset$samplesize_e1[i]/2,
-                                                    p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
-                                                    OR1=dataset$OR1[i],
-                                                    p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
-                                                    OR2=dataset$OR2[i],
-                                                    p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1])) 
+  corr_est_ub[,i] <- c(dataset$corr[i],v_ub)
+  
+  v_b <- replicate(nsim, estimation_b(samplesize=dataset$samplesize_e1[i]/2,
+                                      p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                      OR1=dataset$OR1[i],
+                                      p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                      OR2=dataset$OR2[i],
+                                      p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1])
+  
+  corr_est_b[,i] <- c(dataset$corr[i],v_b)
+  
   print(i)
 }
 
 t1=Sys.time()-t0  
 #  
+save.image("C:/Users/Marta/Nextcloud/Gitkraken/CBE_selection/results/corr_estimation.RData")
 
+corr_est_b <- corr_est_b %>%
+              tibble::rownames_to_column() %>%  
+              pivot_longer(-rowname) %>% 
+              pivot_wider(names_from=rowname, values_from=value) 
+corr_est_b <- corr_est_b[-1]
 
+corr_est_ub <- corr_est_ub %>%
+                tibble::rownames_to_column() %>%  
+                pivot_longer(-rowname) %>% 
+                pivot_wider(names_from=rowname, values_from=value) 
+              
+corr_est_ub <- corr_est_ub[-1]
 
-
-# corr_est <- replicate(nsim, estimation_ub(samplesize=dataset$samplesize_e1[i]/2,
-#                                           p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
-#                                           OR1=dataset$OR1[i],
-#                                           p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
-#                                           OR2=dataset$OR2[i],
-#                                           p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1])
 # 
-# sum(corr_est)/length(corr_est)
-# set.seed(42)
-# aux <- mean(replicate(nsim, estimation_ub(samplesize=dataset$samplesize_e1[i]/2,
-#                                           p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
-#                                           OR1=dataset$OR1[i],
-#                                           p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
-#                                           OR2=dataset$OR2[i],
-#                                           p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1]))
-# 
-# aux
 
+windows()
+p <- list() 
+enum = 1 
+it = 1
+i =1
+for(i in 1:max(dataset$scenario)){
+  
+  sub=subset(dataset,dataset$scenario==i)
+  sub$corr=as.factor(sub$corr)
+  
+  dataggplot <- data.frame(corr=as.factor(corr_est_b[1:9,1]), corr_est=corr_est_b[2:9,])
+  
+  p[[enum]] <-ggplot(dataggplot,aes(x=corr, y=corr_est))  + geom_boxplot() + ggtitle(paste("Scenario", dataset$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))
+  
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=diff_corr_b))  + geom_boxplot() + ggtitle(paste("Scenario", dataset$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")")) 
+  
+  # stable <- data.frame(Corr=sub$corr,ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),"%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)  
+  # 
+  # p[[enum+4]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+  
+  enum=enum+3 
+  it <- it + dim(subset(dataset,dataset$scenario==i))
+}
+marrangeGrob(p,ncol=2,nrow=1,top=NULL) 
 
 
 
