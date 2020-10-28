@@ -17,8 +17,8 @@ library(ggplot2)
 library(gridExtra)
 library(ggpubr)
 library(tidyverse) 
-load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
-# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_bias.RData")
+# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_bias.RData")
 knitr::opts_chunk$set(echo = TRUE) 
 
 ```
@@ -27,9 +27,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Main modifications with respect to previous versions:
 
-  - The scenarios we considered for the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) are a subset of the previous version, while for the correlation  ($\rho$) we have added more values. 
-  - For the endpoint selection, we estimate the correlation at the end of the study based on two different approaches: i) using blinded data; and ii) using unblinded data. See section 2.2. for further explanation. We remark that in contrast with the previous version, we do not use the expected effect on the composite endpoint to estimate the correlation. 
+
   - We have added new constraints on the possible correlation values. See section 2.3. 
+  - Correction on the correlation estimator in the blinded approach. 
+  - Study on the bias of the correlation estimator. See section 3.3.
   
 <!-- the probability of the composite endpoint under the control group, nor previous knowledge of the correlation. -->
 
@@ -252,6 +253,15 @@ ggplot(signlevel_data, aes(x=Endpoint, y=signlevel)) + geom_boxplot()
 
 ```{r}
 summary(dataset[,25:28])
+```
+
+
+## On the bias of the correlation estimator
+
+We run an extra simulation to assess the correlation estimator in both blinded and unblinded approaches. Using the same scenarios we considered before, we simulate each scenario $nsim = 1000$ times. For each run, we estimate the correlation using the blinded and unblinded approach. We then compute the mean and variance of this estimators. We define the bias as the difference between the mean value and the true value of the correlation in that scenario. 
+
+```{r}
+summary(dataset)
 ```
 
 

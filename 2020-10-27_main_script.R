@@ -208,9 +208,9 @@ library(gridExtra)
 library(ggpubr)
 library(tidyverse) 
 # load("C:/Users/Marta/Nextcloud/Gitkraken/CBE_selection/scenarios.RData")
-load('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/scenarios.RData')
+# load('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/scenarios.RData')
 
-set.seed(42)
+# set.seed(42)
 
 # nsim: number of simulations
 nsim = 1000

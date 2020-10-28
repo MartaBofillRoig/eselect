@@ -59,6 +59,21 @@ test_f <- function(OR,p0,n){
   
 }
 
+############################################################## 
+# test_f: computes the statistical test (OR)
+
+testscore_f <- function(p1,p0,n){
+  
+  # p0: probability under control group
+  # p1: probability under intervention group
+  # n: sample size per group 
+  
+  test <- (p0-p1)/sqrt((p0*(1-p0)+p1*(1-p1))/n)
+    
+  return(test)
+  
+}
+
 
 ##############################################################  
 # OR_function: computes the odds ratio

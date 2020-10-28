@@ -59,17 +59,26 @@ f_ES <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,OR_ce,up
     phat_group1 = 1-(sm1[4])/ss
     phat_group0 = 1-(sm0[4])/ss
     
-    # test odds ratio RE
-    TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/ss)^(-1/2)
+    # # test odds ratio RE
+    # TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/ss)^(-1/2)
+    
+    # test risk difference with unpooled variance
+    TestD_unpooled = testscore_f(p1=phat_group1,p0=phat_group0,n=ss)  
+    
   }else{
+    
     phat_group1 = (sm1[1]+sm1[2])/ss
     phat_group0 = (sm0[1]+sm0[2])/ss
     
-    # test odds ratio RE
-    TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/ss)^(-1/2)
+    # # test odds ratio RE
+    # TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/ss)^(-1/2)
+    
+    # test risk difference with unpooled variance
+    TestD_unpooled = testscore_f(p1=phat_group1,p0=phat_group0,n=ss)  
+    
   }
   
-  return(TestOR_unpooled)
+  return(TestD_unpooled)
 }
 
 ##############################################################  
