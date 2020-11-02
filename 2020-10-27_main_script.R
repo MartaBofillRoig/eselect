@@ -196,7 +196,80 @@ t1=Sys.time()-t0
 save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
 # save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
 
+#########################################  
+set.seed(243)
 
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ss.R')
+# dataset$Test_Reject_ESSS <- NA
+# 
+# 
+# for(i in 1:dim(dataset)[1]){
+#   dataset$Test_Reject_ESSS[i] <- sum(replicate(nsim,
+#                                              eselection_bSS(samplesize=dataset$samplesize_e1[i]/2,
+#                                                           p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+#                                                           OR1=dataset$OR1[i],
+#                                                           p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+#                                                           OR2=dataset$OR2[i],
+#                                                           p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i])[1])< - z.alpha)/nsim
+#   # tryCatch(, error=function(e){NA})
+#   print(i)
+# }
+# 
+# # 
+# 
+# 
+# for(i in 1:dim(dataset)[1]){
+#   dataset$Test_Reject_ES_ubSS[i] <- sum(replicate(nsim,
+#                                                 eselection_ubSS(samplesize=dataset$samplesize_e1[i]/2,
+#                                                               p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+#                                                               OR1=dataset$OR1[i],
+#                                                               p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+#                                                               OR2=dataset$OR2[i],
+#                                                               p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i])[1])< - z.alpha)/nsim
+#   print(i)
+# }
+# 
+# t1=Sys.time()-t0  
+# 
+# save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_TrueSS.RData")
+# save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_unblinded.RData")
+
+dataset$Test_Power_ES_ubSS <- NA
+dataset$Test_Power_ES_bSS <- NA
+dataset$decision_ES_ubSS  <- NA
+dataset$decision_ES_bSS <- NA
+
+for(i in 1:dim(dataset)[1]){
+  aux <- rowSums(replicate(nsim,eselection_bSS(samplesize=dataset$samplesize_e1[i]/2,
+                                             p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                             OR1=dataset$OR1[i],
+                                             p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                             OR2=dataset$OR2[i],
+                                             p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  
+  
+  dataset$Test_Power_ES_bSS[i]<- aux[1]
+  dataset$decision_ES_bSS[i]<- 1-aux[2]
+  print(i)
+}
+
+#  
+
+for(i in 1:dim(dataset)[1]){ 
+  aux <- rowSums(replicate(nsim,eselection_ubSS(samplesize=dataset$samplesize_e1[i]/2,
+                                              p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                              OR1=dataset$OR1[i],
+                                              p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                              OR2=dataset$OR2[i],
+                                              p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  dataset$Test_Power_ES_ubSS[i]<- aux[1]
+  dataset$decision_ES_ubSS[i]<- 1-aux[2]
+  print(i)
+} 
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS.RData") 
+#########################################
 
 #########################################  
 

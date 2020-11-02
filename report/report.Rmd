@@ -29,7 +29,7 @@ Main modifications with respect to previous versions:
 
 
   - We have added new constraints on the possible correlation values. See section 2.3. 
-  - Correction on the correlation estimator in the blinded approach. 
+  - Correction on the correlation estimator in the blinded approach. See overleaf document for further details.
   - Study on the bias of the correlation estimator. See section 3.3.
   
 <!-- the probability of the composite endpoint under the control group, nor previous knowledge of the correlation. -->
@@ -218,7 +218,9 @@ for(i in 1:max(dataset$scenario)){
   p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
     geom_point(size=2)+ ggtitle(paste("Scenario", dataset$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
 
-  stable <- data.frame(Corr=sub$corr,ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),"%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)  
+  stable <- data.frame(Corr=sub$corr,
+                       # Corrh=round(sub$corr_est_ub_mean,2),
+                       ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),"%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)  
 
   p[[enum+4]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
 
@@ -252,18 +254,32 @@ ggplot(signlevel_data, aes(x=Endpoint, y=signlevel)) + geom_boxplot()
 
 
 ```{r}
-summary(dataset[,25:28])
+summary(dataset[,27:30])
 ```
 
+Summary cases type 1 error rate$>0.055$ with SE(ub):
+```{r}
+# summary(subset(dataset,dataset[,30]>0.055)) 
+subset(dataset,dataset[,30]>0.055)[,c(1,2,3,4,14,15,16,17,18)]
+```
 
 ## On the bias of the correlation estimator
 
-We run an extra simulation to assess the correlation estimator in both blinded and unblinded approaches. Using the same scenarios we considered before, we simulate each scenario $nsim = 1000$ times. For each run, we estimate the correlation using the blinded and unblinded approach. We then compute the mean and variance of this estimators. We define the bias as the difference between the mean value and the true value of the correlation in that scenario. 
+We ran an extra simulation to assess the correlation estimator in both blinded and unblinded approaches. Using the same scenarios we considered before, we simulate each scenario $nsim = 1000$ times. For each run, we estimate the correlation using the blinded and unblinded approach. We then compute the mean and variance of these estimators. We compute the bias as the difference between the mean value and the true value of the correlation in that scenario. 
 
+Scatterplots estimated correlation vs true correlation:
 ```{r}
-summary(dataset)
+ggplot(dataset, aes(x=corr, y=corr_est_ub_mean)) + geom_point(size=2) + labs(y = "Mean value correlation estimates (Unblinded approach)", x="True correlation")
+
+ggplot(dataset, aes(x=corr, y=corr_est_b_mean)) + geom_point(size=2) + labs(y = "Mean value correlation estimates (Blinded approach)", x="True correlation") 
 ```
 
+Summary bias:
+```{r} 
+# summary(dataset$corr)
+# summary(dataset[,31:36])
+summary(dataset[,35:36])
+```
 
 # Conclusions and future directions
 
@@ -272,11 +288,11 @@ Conclusions:
   - The powers using the selected endpoint (both blinded and unblinded approaches) are in general larger than the ones obtained using the composite endpoint and the relevant endpoint.  
   - The significance level is similar in the four situations.
 
-Open questions:
+<!-- Open questions: -->
 
-  - Review assumptions correlation bounds. 
-  - Consider different association measures between endpoints E1 and E2, say for example Relative Overlap or  Jaccard Index. 
-  - Improve R code
+<!--   - Review assumptions correlation bounds.  -->
+<!--   - Consider different association measures between endpoints E1 and E2, say for example Relative Overlap or  Jaccard Index.  -->
+<!--   - Improve R code -->
 
 Future steps: 
 
