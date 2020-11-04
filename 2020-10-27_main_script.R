@@ -78,6 +78,10 @@ dataset$decision = ifelse(dataset$ARE<1, "RE", "CE")
 # Calculate Sample size (total sample size, n=2*n0=2*n1)
 alpha=0.05; beta=0.2
 dataset$samplesize_e1 = mapply(samplesize_OR,p0=dataset$p0_e1, OR=dataset$OR1, alpha=alpha, beta=beta) 
+dataset$samplesize_ce = mapply(samplesize_OR,p0=dataset$p0_ce, OR=dataset$OR_ce, alpha=alpha, beta=beta) 
+
+dataset$ss_ratio = dataset$samplesize_e1/dataset$samplesize_ce
+dataset$ss_decision = ifelse(dataset$ss_ratio<1, "RE", "CE") 
 
 # clean
 rm(OR1,OR2,p0_e1,p0_e2,corr,scenarios)
@@ -240,6 +244,7 @@ dataset$decision_ES_ubSS  <- NA
 dataset$decision_ES_bSS <- NA
 
 for(i in 1:dim(dataset)[1]){
+# for(i in 95:dim(dataset)[1]){
   aux <- rowSums(replicate(nsim,eselection_bSS(samplesize=dataset$samplesize_e1[i]/2,
                                              p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
                                              OR1=dataset$OR1[i],
@@ -254,9 +259,17 @@ for(i in 1:dim(dataset)[1]){
   print(i)
 }
 
-#  
+#
+i=1
+samplesize=dataset$samplesize_e1[i]/2;
+p0_e1=dataset$p0_e1[i];p1_e1=dataset$p1_e1[i];
+OR1=dataset$OR1[i];
+p0_e2=dataset$p0_e2[i];p1_e2=dataset$p1_e2[i];
+OR2=dataset$OR2[i];
+p0_ce=dataset$p0_ce[i];p1_ce=dataset$p1_ce[i]
 
-for(i in 1:dim(dataset)[1]){ 
+# for(i in 95:dim(dataset)[1]){
+for(i in 1:dim(dataset)[1]){
   aux <- rowSums(replicate(nsim,eselection_ubSS(samplesize=dataset$samplesize_e1[i]/2,
                                               p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
                                               OR1=dataset$OR1[i],
