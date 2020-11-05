@@ -462,11 +462,12 @@ summary {
 
 <div id="TOC">
 <ul>
-<li><a href="#summary"><span class="toc-section-number">1</span> Summary</a></li>
+<li><a href="#changelog"><span class="toc-section-number">1</span> Changelog</a></li>
 <li><a href="#design-and-main-assumptions"><span class="toc-section-number">2</span> Design and main assumptions</a><ul>
-<li><a href="#cases-under-study"><span class="toc-section-number">2.1</span> Cases under study</a></li>
-<li><a href="#estimation-correlation-and-are-recalculation"><span class="toc-section-number">2.2</span> Estimation correlation and ARE recalculation</a></li>
-<li><a href="#correlation-bounds"><span class="toc-section-number">2.3</span> Correlation bounds</a></li>
+<li><a href="#decision-criterias"><span class="toc-section-number">2.1</span> Decision criterias</a></li>
+<li><a href="#cases-under-study"><span class="toc-section-number">2.2</span> Cases under study</a></li>
+<li><a href="#estimation-correlation-and-are-recalculation"><span class="toc-section-number">2.3</span> Estimation correlation and ARE recalculation</a></li>
+<li><a href="#correlation-bounds"><span class="toc-section-number">2.4</span> Correlation bounds</a></li>
 </ul></li>
 <li><a href="#results"><span class="toc-section-number">3</span> Results</a><ul>
 <li><a href="#under-alternative-hypothesis-h_1"><span class="toc-section-number">3.1</span> Under alternative hypothesis (<span class="math inline">\(H_1\)</span>)</a><ul>
@@ -484,15 +485,25 @@ summary {
 </ul>
 </div>
 
-<div id="summary" class="section level1">
-<h1><span class="header-section-number">1</span> Summary</h1>
+<div id="changelog" class="section level1">
+<h1><span class="header-section-number">1</span> Changelog</h1>
 <p>Main modifications with respect to previous versions:</p>
+<p>2020-11-06</p>
+<ul>
+<li>We compare two decision criteria: ARE and Ratio Sample Sizes.</li>
+<li>We evaluate the power when one of the composite components has no treatment effect. See section 2.1.</li>
+</ul>
+<p>2020-10-30</p>
 <ul>
 <li>We have added new constraints on the possible correlation values. See section 2.3.</li>
 <li>Correction on the correlation estimator in the blinded approach. See overleaf document for further details.</li>
 <li>Study on the bias of the correlation estimator. See section 3.3.</li>
 </ul>
-<!-- the probability of the composite endpoint under the control group, nor previous knowledge of the correlation. -->
+<p>2020-09-24</p>
+<ul>
+<li>The scenarios we considered for the parameters (<span class="math inline">\(p_1^{(0)},p_2^{(0)},OR_1,OR_2\)</span>) are a subset of the previous version, while for the correlation (<span class="math inline">\(\rho\)</span>) we have added more values.</li>
+<li>For the endpoint selection, we estimate the correlation at the end of the study based on two different approaches: i) using blinded data; and ii) using unblinded data. See section 2.2. for further explanation. We remark that in contrast with the previous version, we do not use the expected effect on the composite endpoint to estimate the correlation.</li>
+</ul>
 </div>
 <div id="design-and-main-assumptions" class="section level1">
 <h1><span class="header-section-number">2</span> Design and main assumptions</h1>
@@ -510,14 +521,25 @@ summary {
 <li>Probability composite endpoint control group (<span class="math inline">\(p_*^{(0)}\)</span>);</li>
 <li>Odds ratio composite endpoint (<span class="math inline">\(OR_*\)</span>);</li>
 </ul>
-<p>We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. We consider the Asymptotic Relative Efficiency (ARE) method to quantify the efficiency of using the composite endpoint over the endpoint 1 as primary endpoint of the trial. Based on the parameters (<span class="math inline">\(p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho\)</span>), we compute:</p>
+<p>The sample size used for the simulation is calculated to have <span class="math inline">\(0.80\)</span> power to detect an effect of <span class="math inline">\(OR_1\)</span> on the endpoint 1 at significance level <span class="math inline">\(\alpha = 0.05\)</span>.</p>
+<div id="decision-criterias" class="section level2">
+<h2><span class="header-section-number">2.1</span> Decision criterias</h2>
+<p>We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2.</p>
+<p><strong>ARE Method</strong>:</p>
+<p>We consider the Asymptotic Relative Efficiency (ARE) method to quantify the efficiency of using the composite endpoint over the endpoint 1 as primary endpoint of the trial. Based on the parameters (<span class="math inline">\(p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho\)</span>), we compute:</p>
 <ul>
 <li>ARE value;</li>
 <li>ARE Decision: <em>CE</em>, if the composite endpoint is preferred; <em>RE</em>, if the endpoint 1 is preferred.</li>
 </ul>
-<p>We calculate the sample size to have <span class="math inline">\(0.80\)</span> power to detect an effect of <span class="math inline">\(OR_1\)</span> on the endpoint 1 at significance level <span class="math inline">\(\alpha = 0.05\)</span>.</p>
+<p><strong>Ratio Sample sizes</strong>:</p>
+<p>We calculate the sample size to have <span class="math inline">\(0.80\)</span> power to detect an effect of <span class="math inline">\(OR_1\)</span> on the endpoint 1, given the probability <span class="math inline">\(p_1^{(0)}\)</span> under the control group, at significance level <span class="math inline">\(\alpha = 0.05\)</span>, say <span class="math inline">\(n_1\)</span>.</p>
+<p>We also calculate the sample size to have <span class="math inline">\(0.80\)</span> power to detect an effect of <span class="math inline">\(OR_*\)</span> on the composite endpoint, given the probability <span class="math inline">\(p_*^{(0)}\)</span> under the control group, at significance level <span class="math inline">\(\alpha = 0.05\)</span>, say <span class="math inline">\(n_*\)</span>. Note that for calculating the sample size for the composite endpoint have been used the values of the parameters (<span class="math inline">\(p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho\)</span>).</p>
+<p>The decision criteria is the ratio of the two sample sizes:</p>
+<p><span class="math display">\[n_1 / n_*\]</span></p>
+<p>so that if the ratio is smaller than <span class="math inline">\(1\)</span>, we use the relevant endpoint; whereas if the ratio is larger than <span class="math inline">\(1\)</span>, we use the composiste endpoint.</p>
+</div>
 <div id="cases-under-study" class="section level2">
-<h2><span class="header-section-number">2.1</span> Cases under study</h2>
+<h2><span class="header-section-number">2.2</span> Cases under study</h2>
 <p>We evaluate through simulations the statistical power and significance level under different situations and using different primary endpoints.</p>
 <p>For each scenario, we compare the two groups based on three endpoints:</p>
 <ul>
@@ -526,7 +548,7 @@ summary {
 <li>the selected endpoint: we select the primary endpoint at the end of the trial. We do so based on the ARE method and using blinded/unblinded data to estimate the probabilities under the control group and the correlation.</li>
 </ul>
 <p>Remark: we simulate <span class="math inline">\(100000\)</span> trials for each scenario and for each endpoint considered as primary endpoint; <!-- 2) we estimate the correlation using the estimated probabilities ($p_1^{(0)},p_2^{(0)},p_*^{(0)}$).  --></p>
-<p>For each scenario, we evaluate the following situations:</p>
+<p>For each scenario, we evaluate the following cases:</p>
 <ol style="list-style-type: decimal">
 <li><p>Under alternative hypothesis (<span class="math inline">\(H_1\)</span>):</p>
 <ol style="list-style-type: lower-alpha">
@@ -541,10 +563,14 @@ summary {
 <li>testing the group differences based on the selected endpoint.</li>
 </ol></li>
 </ol>
-<p>When simulating under <span class="math inline">\(H_0\)</span>, we consider <span class="math inline">\(OR_1=OR_2=1\)</span>; whereas when simulating under <span class="math inline">\(H_1\)</span>; we consider the previous mentioned values for <span class="math inline">\(OR_1\)</span>, <span class="math inline">\(OR_2\)</span>, and <span class="math inline">\(OR_*\)</span>.</p>
+<p>When simulating under <span class="math inline">\(H_0\)</span>, we consider <span class="math inline">\(OR_1=OR_2=1\)</span>; whereas when simulating under <span class="math inline">\(H_1\)</span>, we consider the following situations: <!-- ; we consider the previous mentioned values for $OR_1$, $OR_2$, and $OR_*$. --></p>
+<ul>
+<li>Effect on both composite components: That is, we consider the previous mentioned values for <span class="math inline">\(OR_1\)</span>, <span class="math inline">\(OR_2\)</span>, and the resulting <span class="math inline">\(OR_*\)</span>.</li>
+<li>Effect on only one component: That is, we plan the trial based on the previous mentioned values <span class="math inline">\(OR_1\)</span>, <span class="math inline">\(OR_2\)</span>, and the resulting <span class="math inline">\(OR_*\)</span>, but we simulate that <span class="math inline">\(OR_1=1\)</span> or <span class="math inline">\(OR_2=1\)</span>.</li>
+</ul>
 </div>
 <div id="estimation-correlation-and-are-recalculation" class="section level2">
-<h2><span class="header-section-number">2.2</span> Estimation correlation and ARE recalculation</h2>
+<h2><span class="header-section-number">2.3</span> Estimation correlation and ARE recalculation</h2>
 <p>We consider two different approaches for estimating the correlation between the endpoints 1 and 2.</p>
 <p><strong>Blinded approach</strong>:</p>
 <p>Based on the observed responses in the pooled sample, we estimate the probabilities <span class="math inline">\(p_1\)</span>, <span class="math inline">\(p_2\)</span>, and <span class="math inline">\(p_*\)</span>, where <span class="math inline">\(p_k=\pi p_k^{(0)} + (1-\pi)p_k^{(1)}\)</span> for <span class="math inline">\(k=1,2,*\)</span> and <span class="math inline">\(\pi=n^{(0)}/n\)</span>. Assuming the expected effects for the endpoints 1 and 2 (say <span class="math inline">\(OR_1\)</span> and <span class="math inline">\(OR_2\)</span>) pre-specified in advance, we obtain estimates of the probabilities of each composite component under the control group <span class="math inline">\(p_1^{(0)},p_2^{(0)}\)</span> and subsequently the estimates of the probabilities under the treatment group <span class="math inline">\(p_1^{(1)},p_2^{(1)}\)</span>.</p>
@@ -556,7 +582,7 @@ summary {
 <p>We calculate the ARE by using the estimated probabilities <span class="math inline">\(p_1^{(0)},p_2^{(0)}\)</span> and the mean of the two estimates of the correlation.</p>
 </div>
 <div id="correlation-bounds" class="section level2">
-<h2><span class="header-section-number">2.3</span> Correlation bounds</h2>
+<h2><span class="header-section-number">2.4</span> Correlation bounds</h2>
 <p>As mentioned before, Pearson correlation coefficient between two binary endpoints takes values between two bounds: denote by <span class="math inline">\(B_L(\cdot)\)</span> the lower bound, and by <span class="math inline">\(B_U(\cdot)\)</span> the upper bound. Both <span class="math inline">\(B_L(\cdot)\)</span> and <span class="math inline">\(B_U(\cdot)\)</span> are functions of the marginal probabilities of the binary endpoints.</p>
 <p>Thus, in our context, the correlation between endpoints 1 and 2 in the control group lies within <span class="math inline">\(B_L(p_1^{(0)},p_2^{(0)})\)</span> and <span class="math inline">\(B_U(p_1^{(0)},p_2^{(0)})\)</span>; whereas the correlation between them in the treatment group takes values between <span class="math inline">\(B_L(p_1^{(1)},p_2^{(1)})\)</span> and <span class="math inline">\(B_U(p_1^{(1)},p_2^{(1)})\)</span>.</p>
 <p>Since we assume that the correlation is the same in both treatment groups, we require that:</p>
@@ -573,7 +599,7 @@ max(B_L(p_1^{(0)},p_2^{(0)}),B_L(p_1^{(1)},p_2^{(1)})) \leq \rho \leq min(B_U(p_
 <h2><span class="header-section-number">3.1</span> Under alternative hypothesis (<span class="math inline">\(H_1\)</span>)</h2>
 <div id="cases-1a-and-1b" class="section level3">
 <h3><span class="header-section-number">3.1.1</span> Cases (1a) and (1b)</h3>
-<p>In what follows we compare the statistical powers obtained using the composite endpoint with the ones obtained using the endpoint 1 as primary endpoint. We also evaluate the concordance between the choice of the primary endpoint <!-- decision between using the composite endpoint or the endpoint 1  --> -according to the ARE value- and the difference in powers obtained in the simulation. In this case, we calculate the ARE at the beginning of the study, and then according to the parameters (<span class="math inline">\(p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho\)</span>).</p>
+<p>In what follows we compare the statistical powers obtained using the composite endpoint with the ones obtained using the endpoint 1 as primary endpoint. We also evaluate the concordance between the choice of the primary endpoint <!-- decision between using the composite endpoint or the endpoint 1  --> -according to the ARE value and the ratio of the sample sizes- and the difference in powers obtained in the simulation. In this case, we calculate the ARE at the beginning of the study, and then according to the parameters (<span class="math inline">\(p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho\)</span>).</p>
 <pre class="r"><code>dataset$diff_powers = dataset$Test_Power_CE - dataset$Test_Power_RE </code></pre>
 <p>The following plot shows the relationship between the ARE value and the difference in power between using the composite endpoint (CE) or using the endpoint 1 (RE).</p>
 <pre class="r"><code>ggplot(dataset, aes(x=ARE, y=diff_powers, color=as.factor(decision))) + geom_point(size=2) + labs(y = &quot;Difference in power (Power CE - Power RE)&quot;, x=&quot;ARE&quot;, color=&quot;Decision&quot;)</code></pre>
