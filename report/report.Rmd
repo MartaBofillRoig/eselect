@@ -23,10 +23,12 @@ load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_
 dataset_ARE= dataset
 load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS.RData")
 dataset_SS= dataset
-dataset = data.frame(dataset_ARE,dataset_SS[,21:27])
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_H0True.RData")
+dataset_SSh0= dataset
+
+dataset = data.frame(dataset_ARE,dataset_SS[,21:27],dataset_SSh0[,24:25])
 
 knitr::opts_chunk$set(echo = TRUE) 
-
 ```
 
 # Changelog

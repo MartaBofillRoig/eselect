@@ -8,26 +8,20 @@
 # computation sample size SS
 # computation statistic according to the decision (based on SS)
 
-eselection_bSS <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){  
-  total_ss = samplesize*2
-  # control group
-  s1_group0 = p0_e1 + p0_e2 - p0_ce
-  s2_group0 = p0_ce-p0_e2  
-  s3_group0 = p0_ce-p0_e1  
-  s4_group0 = 1- p0_ce  
+eselect_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){  
   
-  sm0 = rmultinom(1,samplesize,c(s1_group0,s2_group0,s3_group0,s4_group0)) 
+  n_init=samplesize
+  samplesize=round(n_init*p_init)
+  total_ss = samplesize*2
+  
+  # control group
+  sm0 = f_sim(samplesize=samplesize,p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
   
   # intervention group
-  s1_group1 = p1_e1+p1_e2-p1_ce
-  s2_group1 = ifelse(p1_ce-p1_e2>0, p1_ce-p1_e2, 0)  
-  s3_group1 = ifelse(p1_ce-p1_e1>0, p1_ce-p1_e1, 0)   
-  s4_group1 = 1- p1_ce  
-  
-  sm1 = rmultinom(1,samplesize,c(s1_group1,s2_group1,s3_group1,s4_group1))
+  sm1 = f_sim(samplesize=samplesize,p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
   
   # pooled sample
-  sm = sm0 + sm1
+  sm = sm0 + sm1 
   
   # estimated probabilities
   phat_e1 = (sm[1]+sm[2])/total_ss
@@ -46,23 +40,9 @@ eselection_bSS <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_c
   corrhat =  (phat_ce - (samplesize/total_ss)*(1 - (1-phat0_e1)*(1-phat0_e2)) - (samplesize/total_ss)*(1-(1-phat1_e1)*(1-phat1_e2)))/(-(samplesize/total_ss)*sqrt(phat0_e1*phat0_e2*(1-phat0_e1)*(1-phat0_e2))-(samplesize/total_ss)*sqrt(phat1_e1*phat1_e2*(1-phat1_e1)*(1-phat1_e2))) 
   
   # correlation restrictions  
-  update_uppcorr0=upper_corr(phat0_e1,phat0_e2)
-  # update_uppcorr1=upper_corr(phat1_e1,phat1_e2) 
-  uppcorr0=upper_corr(p0_e1,p0_e2)
-  uppcorr1=upper_corr(p1_e1,p1_e2)
-  uppcorr12=upper_corr((OR1*phat0_e1/(1-phat0_e1))/(1+(OR1*phat0_e1/(1-phat0_e1))),
-                       (OR2*phat0_e2/(1-phat0_e2))/(1+(OR2*phat0_e2/(1-phat0_e2))))
-  
-  upp = min(update_uppcorr0,uppcorr0,uppcorr1,uppcorr12)
-  
-  update_lowcorr0= lower_corr(phat0_e1,phat0_e2)  
-  # update_lowcorr1=lower_corr(phat1_e1,phat1_e2)
-  lowcorr0= lower_corr(p0_e1,p0_e2)  
-  lowcorr1=lower_corr(p1_e1,p1_e2)
-  lowcorr12=lower_corr((OR1*phat0_e1/(1-phat0_e1))/(1+(OR1*phat0_e1/(1-phat0_e1))),
-                       (OR2*phat0_e2/(1-phat0_e2))/(1+(OR2*phat0_e2/(1-phat0_e2))))
-  
-  low = max(update_lowcorr0,lowcorr0,lowcorr1,lowcorr12) 
+  rest = corr_rest_b(phat0_e1,phat0_e2,p0_e1,p0_e2,p1_e1,p1_e2,OR1,OR2)
+  low = rest[1]
+  upp = rest[2]
   
   corrhat_c = corrhat
   if(corrhat > upp){
@@ -84,9 +64,9 @@ eselection_bSS <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_c
                                     alpha = 0.05,
                                     beta = 0.2)
   
-  ARE_up = samplesize_e1/samplesize_estar
+  ratio_ss = samplesize_e1/samplesize_estar
   
-  if(ARE_up>= 1){
+  if(ratio_ss>= 1){
     phat_group1 = 1-(sm1[4])/samplesize
     phat_group0 = 1-(sm0[4])/samplesize
     
@@ -110,25 +90,22 @@ eselection_bSS <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_c
 
 
 ##############################################################  
-# eselection_ub:
+# eselect_ub_int:
 # simulation
 # estimation correlation unblinded without previous info corr/CE
 # computation ratio sample size
 # computation statistic according to the decision
 
-eselection_ub_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,p_init=1){ 
+eselect_ub_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,p_init=1){ 
   
   n_init=samplesize
   samplesize=round(n_init*p_init)
-  
   total_ss = samplesize*2
-  
+
   # control group
   sm0 = f_sim(samplesize=samplesize,p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
-  
   # intervention group
   sm1 = f_sim(samplesize=samplesize,p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
-  
   # pooled sample
   sm = sm0 + sm1
   
