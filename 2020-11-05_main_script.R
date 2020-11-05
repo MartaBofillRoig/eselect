@@ -33,7 +33,9 @@ library(plyr)
 library(devtools) 
 install_github("CompARE-Composite/CompARE-package")
 library(CompARE)
-
+library(ggplot2)
+library(gridExtra)
+library(ggpubr) 
 
 #########################################
 # Define the set of scenarios
@@ -100,7 +102,7 @@ dataset$Test_Reject_ES <- NA
 dataset$Test_Reject_ES_ub <- NA
 
 #########################################
-# Simulations
+# General Settings Simulations
 #########################################
 
 set.seed(4123)
@@ -113,9 +115,13 @@ z.alpha <- qnorm(1-alpha,0,1)
 z.beta <-  qnorm(1-beta,0,1) 
 
 
-t0=Sys.time() 
 
 #########################################
+# Simulation under H1
+#########################################
+
+t0=Sys.time() 
+
 
 for(i in 1:dim(dataset)[1]){
   dataset$Test_Power_CE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_e1[i]/2,dataset$p0_ce[i],dataset$p1_ce[i]))< - z.alpha)/nsim
@@ -155,8 +161,103 @@ for(i in 1:dim(dataset)[1]){
   print(i)
 } 
 save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_False.RData") 
-#########################################
 
+
+#########################################  
+# Endpoint selection based on ratio sample sizes
+
+set.seed(243)
+
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ss.R') 
+
+dataset$Test_Power_ES_ubSS <- NA
+dataset$Test_Power_ES_bSS <- NA
+dataset$decision_ES_ubSS  <- NA
+dataset$decision_ES_bSS <- NA
+
+for(i in 1:dim(dataset)[1]){
+  # for(i in 95:dim(dataset)[1]){
+  aux <- rowSums(replicate(nsim,eselection_bSS(samplesize=dataset$samplesize_e1[i]/2,
+                                               p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                               OR1=dataset$OR1[i],
+                                               p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                               OR2=dataset$OR2[i],
+                                               p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  
+  
+  dataset$Test_Power_ES_bSS[i]<- aux[1]
+  dataset$decision_ES_bSS[i]<- 1-aux[2]
+  print(i)
+}
+
+#   
+for(i in 1:dim(dataset)[1]){
+  aux <- rowSums(replicate(nsim,eselection_ubSS(samplesize=dataset$samplesize_e1[i]/2,
+                                                p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                                OR1=dataset$OR1[i],
+                                                p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                                OR2=dataset$OR2[i],
+                                                p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  dataset$Test_Power_ES_ubSS[i]<- aux[1]
+  dataset$decision_ES_ubSS[i]<- 1-aux[2]
+  print(i)
+} 
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS.RData") 
+#########################################
+#########################################  
+
+# Simulation under H1 - simulating that one endpoint has no effect
+# Endpoint selection based on ratio sample sizes
+
+set.seed(5521)
+
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ss.R') 
+
+dataset$Test_Power_ES_ubSS <- NA
+dataset$Test_Power_ES_bSS <- NA
+dataset$decision_ES_ubSS  <- NA
+dataset$decision_ES_bSS <- NA
+# dataset$noeffect_e1  <- NA
+# dataset$decision_ES_bSS <- NA
+
+for(i in 1:dim(dataset)[1]){
+  # for(i in 95:dim(dataset)[1]){
+  aux <- rowSums(replicate(nsim,eselection_bSS(samplesize=dataset$samplesize_e1[i]/2,
+                                               p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+                                               OR1=dataset$OR1[i],
+                                               p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                               OR2=dataset$OR2[i],
+                                               p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  
+  
+  dataset$Test_Power_ES_bSS[i]<- aux[1]
+  dataset$decision_ES_bSS[i]<- 1-aux[2] 
+  print(i)
+}
+
+#   
+for(i in 1:dim(dataset)[1]){
+  aux <- rowSums(replicate(nsim,eselection_ubSS(samplesize=dataset$samplesize_e1[i]/2,
+                                                p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
+                                                OR1=dataset$OR1[i],
+                                                p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                                OR2=dataset$OR2[i],
+                                                p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  dataset$Test_Power_ES_ubSS[i]<- aux[1]
+  dataset$decision_ES_ubSS[i]<- 1-aux[2]
+  print(i)
+} 
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_add.RData") 
+
+
+
+#########################################
+# Simulation under H0
+#########################################
 
 set.seed(2314)
 
@@ -205,10 +306,9 @@ set.seed(243)
 
 source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ss.R') 
 
-dataset$Test_Power_ES_ubSS <- NA
-dataset$Test_Power_ES_bSS <- NA
-dataset$decision_ES_ubSS  <- NA
-dataset$decision_ES_bSS <- NA
+
+dataset$Test_Reject_ES_ubSS <- NA
+dataset$Test_Reject_ES_bSS <- NA 
 
 for(i in 1:dim(dataset)[1]){
 # for(i in 95:dim(dataset)[1]){
@@ -221,47 +321,32 @@ for(i in 1:dim(dataset)[1]){
   
   
   
-  dataset$Test_Power_ES_bSS[i]<- aux[1]
-  dataset$decision_ES_bSS[i]<- 1-aux[2]
+  dataset$Test_Reject_ES_bSS[i]<- aux[1]
+  # dataset$decision_ES_bSS[i]<- 1-aux[2]
   print(i)
 }
 
-# #
-# i=1
-# samplesize=dataset$samplesize_e1[i]/2;
-# p0_e1=dataset$p0_e1[i];p1_e1=dataset$p1_e1[i];
-# OR1=dataset$OR1[i];
-# p0_e2=dataset$p0_e2[i];p1_e2=dataset$p1_e2[i];
-# OR2=dataset$OR2[i];
-# p0_ce=dataset$p0_ce[i];p1_ce=dataset$p1_ce[i]
-
-# for(i in 95:dim(dataset)[1]){
+#   
 for(i in 1:dim(dataset)[1]){
   aux <- rowSums(replicate(nsim,eselection_ubSS(samplesize=dataset$samplesize_e1[i]/2,
-                                              p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                              p0_e1=dataset$p0_e1[i],p1_e1=dataset$p0_e1[i],
                                               OR1=dataset$OR1[i],
-                                              p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                              p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
                                               OR2=dataset$OR2[i],
-                                              p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+                                              p0_ce=dataset$p0_ce[i],p1_ce=dataset$p0_ce[i]))< c(-z.alpha,1))/nsim
   
-  dataset$Test_Power_ES_ubSS[i]<- aux[1]
-  dataset$decision_ES_ubSS[i]<- 1-aux[2]
+  dataset$Test_Reject_ES_ubSS[i]<- aux[1]
+  # dataset$decision_ES_ubSS[i]<- 1-aux[2]
   print(i)
 } 
-save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS.RData") 
+save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_H0True.RData") 
 #########################################
-
 #########################################  
+
 
 ######################################### 
+# Bias correlation 
 #########################################  
-# results
-library(ggplot2)
-library(gridExtra)
-library(ggpubr)
-library(tidyverse) 
-# load("C:/Users/Marta/Nextcloud/Gitkraken/CBE_selection/scenarios.RData")
-# load('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/scenarios.RData')
 
 # set.seed(42)
 
