@@ -252,7 +252,52 @@ for(i in 1:dim(dataset)[1]){
 } 
 save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_add.RData") 
 
+#########################################  
 
+# Simulation under H1 - simulating that one endpoint has no effect
+# Endpoint selection based on ratio sample sizes
+
+set.seed(4123)
+
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ss.R') 
+
+dataset$Test_Power_ES_ubSS <- NA
+dataset$Test_Power_ES_bSS <- NA
+dataset$decision_ES_ubSS  <- NA
+dataset$decision_ES_bSS <- NA
+# dataset$noeffect_e1  <- NA
+# dataset$decision_ES_bSS <- NA
+
+for(i in 1:dim(dataset)[1]){
+  # for(i in 95:dim(dataset)[1]){
+  aux <- rowSums(replicate(nsim,eselection_bSS(samplesize=dataset$samplesize_e1[i]/2,
+                                               p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                               OR1=dataset$OR1[i],
+                                               p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+                                               OR2=dataset$OR2[i],
+                                               p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  
+  
+  dataset$Test_Power_ES_bSS[i]<- aux[1]
+  dataset$decision_ES_bSS[i]<- 1-aux[2] 
+  print(i)
+}
+
+#   
+for(i in 1:dim(dataset)[1]){
+  aux <- rowSums(replicate(nsim,eselection_ubSS(samplesize=dataset$samplesize_e1[i]/2,
+                                                p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                                OR1=dataset$OR1[i],
+                                                p0_e2=dataset$p0_e2[i],p1_e2=dataset$p0_e2[i],
+                                                OR2=dataset$OR2[i],
+                                                p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i]))< c(-z.alpha,1))/nsim
+  
+  dataset$Test_Power_ES_ubSS[i]<- aux[1]
+  dataset$decision_ES_ubSS[i]<- 1-aux[2]
+  print(i)
+} 
+save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_add2.RData") 
 
 #########################################
 # Simulation under H0
@@ -338,7 +383,7 @@ for(i in 1:dim(dataset)[1]){
   # dataset$decision_ES_ubSS[i]<- 1-aux[2]
   print(i)
 } 
-save.image("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_H0True.RData") 
+save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_H0True.RData") 
 #########################################
 #########################################  
 

@@ -19,6 +19,8 @@ library(ggpubr)
 library(tidyverse) 
 
 # Datasets
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS_add.RData") 
+dataset_SSadd = dataset
 load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_bias.RData")
 dataset_ARE= dataset
 load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_SS.RData")
@@ -281,7 +283,40 @@ marrangeGrob(p,ncol=4,nrow=1,top=NULL)
 # ,heights = c(5, 10)
 ```
 
-<!-- ### Toy example to compare blinded and unblinded approaches -->
+### Additional scenarios
+
+```{r, fig.height=4, fig.width=10, warning=FALSE} 
+p <- list() 
+enum = 1 
+it <- 1
+for(i in 1:max(dataset_SSadd$scenario)){
+  sub=subset(dataset_SSadd,dataset_SSadd$scenario==i)
+  # sub=subset(dataset,dataset$scenario==i)
+  # 
+  
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_bSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_SSadd$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_SSadd$p0_e1[it],",",dataset_SSadd$p0_e2[it],",",dataset_SSadd$OR1[it],",",dataset_SSadd$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_SSadd$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_SSadd$p0_e1[it],",",dataset_SSadd$p0_e2[it],",",dataset_SSadd$OR1[it],",",dataset_SSadd$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  # p[[enum+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE))  +
+  #   geom_point(size=2)+ ggtitle(paste("Scenario", dataset$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (CE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+  # p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
+  #   geom_point(size=2)+ ggtitle(paste("Scenario", dataset$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9)) 
+  
+  stable <- data.frame(Corr=sub$corr, 
+                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_bSS,2),
+                       "%CE_u"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)  
+
+  p[[enum+2]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+3
+  it <- it + dim(subset(dataset_SSadd,dataset_SSadd$scenario==i))
+}
+marrangeGrob(p,ncol=3,nrow=1,top=NULL) 
+# ,heights = c(5, 10)
+```
+
 
 ## Under the null hypothesis ($H_0$)
 
@@ -292,9 +327,13 @@ The following boxplots show the significance level obtained using the composite 
 ```{r, warning=F}
 signlevel_data <- data.frame(signlevel=c(dataset$Test_Reject_ES,
                                          dataset$Test_Reject_ES_ub,
+                                         dataset$Test_Reject_ES_bSS,
+                                         dataset$Test_Reject_ES_ubSS,
                                          dataset$Test_Reject_CE,dataset$Test_Reject_RE),
                              Endpoint=c(rep("SE",length(dataset$Test_Power_ES)),
                                         rep("SE(ub)",length(dataset$Test_Reject_ES_ub)),
+                                        rep("SE (ss/b)",length(dataset$Test_Reject_ES_bSS)),
+                                        rep("SE (ss/ub)",length(dataset$Test_Reject_ES_ubSS)),
                                         rep("CE",length(dataset$Test_Power_CE)),
                                         rep("RE",length(dataset$Test_Power_RE)))
                              )
@@ -305,6 +344,7 @@ ggplot(signlevel_data, aes(x=Endpoint, y=signlevel)) + geom_boxplot()
 
 ```{r}
 summary(dataset[,27:30])
+summary(data.frame(Test_Reject_ES_bSS=dataset$Test_Reject_ES_bSS,Test_Reject_ES_ubSS=dataset$Test_Reject_ES_ubSS))
 ```
 
 Summary cases type 1 error rate$>0.055$ with SE(ub):
