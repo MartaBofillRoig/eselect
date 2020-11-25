@@ -8,7 +8,7 @@
 # computation sample size SS
 # computation statistic according to the decision (based on SS)
 
-eselect_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){  
+eselect_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,p_init=1,criteria="SS"){  
   
   n_init=samplesize
   samplesize=round(n_init*p_init)
@@ -52,7 +52,6 @@ eselect_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){
     corrhat_c = low
   } 
   
-  # decision based on blinded data
   samplesize_e1 = samplesize_OR(p0=phat0_e1, OR=OR1, alpha=0.05, beta=0.2)
   samplesize_estar = samplesize_cbe(p0_e1=phat0_e1,p0_e2=phat0_e2,
                                     eff_e1 = OR1,
@@ -64,25 +63,91 @@ eselect_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){
                                     alpha = 0.05,
                                     beta = 0.2)
   
-  ratio_ss = samplesize_e1/samplesize_estar
-  
-  if(ratio_ss>= 1){
-    phat_group1 = 1-(sm1[4])/samplesize
-    phat_group0 = 1-(sm0[4])/samplesize
+  if(criteria=="SS"){
     
-    # test odds ratio CE
-    TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/samplesize)^(-1/2)
+    ratio_ss = samplesize_e1/samplesize_estar
     
-    Decision = 1
+    if(ratio_ss>= 1){ 
+      
+      if(total_ss<samplesize_estar){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = 1-(sm1[4])/samplesize
+      phat_group0 = 1-(sm0[4])/samplesize
+      
+      # test odds ratio CE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 1
+      
+    }else{
+      
+      if(total_ss<samplesize_e1){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = (sm1[1]+sm1[2])/samplesize
+      phat_group0 = (sm0[1]+sm0[2])/samplesize
+      
+      # test odds ratio RE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 0
+    }
+  }
+  if(criteria=="ARE"){
     
-  }else{
-    phat_group1 = (sm1[1]+sm1[2])/samplesize
-    phat_group0 = (sm0[1]+sm0[2])/samplesize
+    ARE_up = ARE_cbe(p0_e1=phat0_e1, p0_e2=phat0_e2, eff_e1=OR1, eff_e2=OR2, rho=corrhat_c)
     
-    # test odds ratio RE
-    TestOR_unpooled = log((phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)))*((1/(phat_group0*(1-phat_group0))+ 1/(phat_group1*(1-phat_group1)))/samplesize)^(-1/2)
-    
-    Decision = 0
+    if(ARE_up>= 1){ 
+      
+      if(total_ss<samplesize_estar){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = 1-(sm1[4])/samplesize
+      phat_group0 = 1-(sm0[4])/samplesize
+      
+      # test odds ratio CE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 1
+      
+    }else{
+      
+      if(total_ss<samplesize_e1){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = (sm1[1]+sm1[2])/samplesize
+      phat_group0 = (sm0[1]+sm0[2])/samplesize
+      
+      # test odds ratio RE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 0
+    }
   }
   
   return(c(TestOR_unpooled,Decision))
@@ -96,7 +161,7 @@ eselect_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){
 # computation ratio sample size
 # computation statistic according to the decision
 
-eselect_ub_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,p_init=1){ 
+eselect_ub_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,p_init=1,criteria="SS"){ 
   
   n_init=samplesize
   samplesize=round(n_init*p_init)
@@ -154,45 +219,91 @@ eselect_ub_int <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_c
                                     alpha = 0.05,
                                     beta = 0.2)
   
-  ratio_ss = samplesize_e1/samplesize_estar
-  
-  if(ratio_ss>= 1){ 
+  if(criteria=="SS"){
     
-    if(total_ss<samplesize_estar){
-      # control group
-      sm0_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
-      sm0 = sm0 + sm0_add
-      # intervention group
-      sm1_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
-      sm1 = sm1 + sm1_add  
+    ratio_ss = samplesize_e1/samplesize_estar
+    
+    if(ratio_ss>= 1){ 
+      
+      if(total_ss<samplesize_estar){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = 1-(sm1[4])/samplesize
+      phat_group0 = 1-(sm0[4])/samplesize
+      
+      # test odds ratio CE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 1
+      
+    }else{
+      
+      if(total_ss<samplesize_e1){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = (sm1[1]+sm1[2])/samplesize
+      phat_group0 = (sm0[1]+sm0[2])/samplesize
+      
+      # test odds ratio RE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 0
     }
+  }
+  if(criteria=="ARE"){
     
-    phat_group1 = 1-(sm1[4])/samplesize
-    phat_group0 = 1-(sm0[4])/samplesize
+    ARE_up = ARE_cbe(p0_e1=phat0_e1, p0_e2=phat0_e2, eff_e1=OR1, eff_e2=OR2, rho=corrhat_c)
     
-    # test odds ratio CE
-    TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
-    
-    Decision = 1
-    
-  }else{
-    
-    if(total_ss<samplesize_e1){
-      # control group
-      sm0_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
-      sm0 = sm0 + sm0_add
-      # intervention group
-      sm1_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
-      sm1 = sm1 + sm1_add  
+    if(ARE_up>= 1){ 
+      
+      if(total_ss<samplesize_estar){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_estar/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = 1-(sm1[4])/samplesize
+      phat_group0 = 1-(sm0[4])/samplesize
+      
+      # test odds ratio CE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 1
+      
+    }else{
+      
+      if(total_ss<samplesize_e1){
+        # control group
+        sm0_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
+        sm0 = sm0 + sm0_add
+        # intervention group
+        sm1_add = f_sim(samplesize=round(samplesize_e1/2 - samplesize),p_e1=p1_e1,p_e2=p1_e2,p_ce=p1_ce)
+        sm1 = sm1 + sm1_add  
+      }
+      
+      phat_group1 = (sm1[1]+sm1[2])/samplesize
+      phat_group0 = (sm0[1]+sm0[2])/samplesize
+      
+      # test odds ratio RE
+      TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
+      
+      Decision = 0
     }
-    
-    phat_group1 = (sm1[1]+sm1[2])/samplesize
-    phat_group0 = (sm0[1]+sm0[2])/samplesize
-    
-    # test odds ratio RE
-    TestOR_unpooled = test_f(OR=(phat_group1/(1-phat_group1))/(phat_group0/(1-phat_group0)),p0=phat_group0,n=samplesize) 
-    
-    Decision = 0
   }
   
   return(c(TestOR_unpooled,Decision))
