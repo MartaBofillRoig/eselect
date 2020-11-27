@@ -28,12 +28,15 @@
 
 eselect <- function(db,p0_e1,OR1,p0_e2,OR2,criteria="SS"){
 
-  total_ss = sum(sm)
+  total_ss = sum(db)
+
+  p1_e1 = (OR1*p0_e1/(1-p0_e1))/(1+(OR1*p0_e1/(1-p0_e1)))
+  p1_e2 = (OR2*p0_e2/(1-p0_e2))/(1+(OR2*p0_e2/(1-p0_e2)))
 
   # estimated probabilities
-  phat_e1 = (sm[1]+sm[2])/total_ss
-  phat_e2 = (sm[1]+sm[3])/total_ss
-  phat_ce = 1-(sm[4])/total_ss
+  phat_e1 = (db[1]+db[2])/total_ss
+  phat_e2 = (db[1]+db[3])/total_ss
+  phat_ce = 1-(db[4])/total_ss
 
   #
   phat0_e1 = fun_p0(p=phat_e1,l=OR1)

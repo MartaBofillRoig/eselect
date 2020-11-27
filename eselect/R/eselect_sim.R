@@ -22,11 +22,17 @@
 # computation sample size SS
 # computation statistic according to the decision (based on SS)
 
-eselect_sim <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,p_init=1,criteria="SS"){
+eselect_sim <- function(samplesize,p0_e1,OR1,p0_e2,OR2,p0_ce,p_init=1,criteria="SS"){
 
   n_init=samplesize
   samplesize=round(n_init*p_init)
   total_ss = samplesize*2
+
+  p1_e1 = (OR1*p0_e1/(1-p0_e1))/(1+(OR1*p0_e1/(1-p0_e1)))
+  p1_e2 = (OR2*p0_e2/(1-p0_e2))/(1+(OR2*p0_e2/(1-p0_e2)))
+
+  rho_ds = -(p0_ce-(1-(1-p0_e1)*(1-p0_e2)))/(sqrt(p0_e1*p0_e2*(1-p0_e1)*(1-p0_e2)))
+  p1_ce = prob_cbe(p_e1=p1_e1, p_e2=p1_e2, rho=rho_ds)
 
   # control group
   sm0 = f_sim(samplesize=samplesize,p_e1=p0_e1,p_e2=p0_e2,p_ce=p0_ce)
@@ -164,5 +170,7 @@ eselect_sim <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce,p
     }
   }
 
-  return(c(TestOR_unpooled,Decision))
+  output = list(dataset0=sm0, dataset1=sm1, Test=TestOR_unpooled, Decision=Decision)
+
+  return(output)
 }
