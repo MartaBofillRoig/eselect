@@ -1,9 +1,14 @@
-#' eselect
+#' eselect_sim
 #'
 #' @description
 #'
-#'
+#' @param ss_arm numeric parameter, sample size per arm
 #' @param p0_e1 numeric parameter, probability of occurrence E1 in the control group
+#' @param p0_e2 numeric parameter, probability of occurrence E2 in the control group
+#' @param OR1 numeric parameter, Odds ratio for the endpoint 1
+#' @param OR2 numeric parameter, Odds ratio for the endpoint 2
+#' @param p_init numeric parameter, percentage of sample size used in the interim
+#' @param criteria decision criteria to choose between the composite endpoint or the endpoint 1 as primary endpoint ("SS": Ratio sample sizes, "ARE": Asymptotic Relative Efficiency).
 #'
 #' @export
 #'
