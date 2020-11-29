@@ -1,0 +1,253 @@
+---
+title: "Endpoint selection and sample size recalculation with composite binary endpoints"
+author: "Vienna-Barcelona"
+date: "`r Sys.Date()`"
+output: 
+  beamer_presentation: 
+    theme: "Boadilla"
+    colortheme: "beaver" 
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(ggpubr)
+library(tidyverse)
+library(tidyr)
+library(plyr)
+library(devtools)
+install_github("CompARE-Composite/CompARE-package")
+library(CompARE) 
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ce.R')
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+knitr::opts_chunk$set(echo = FALSE)
+set.seed(5366)
+```
+
+## Main ideas and motivation
+
+
+\bigskip
+
+\begin{block}{Goal}
+  
+  To define a theoretic-decision framework to add/drop components into a primary composite endpoint and to reassess the sample size accordingly.
+  
+\end{block}
+
+**Our proposal**: Trial design with an interim stage in which we: 
+
+  1.  evaluate whether or not to add/drop components into the composite endpoint;
+  2.  determine which testing procedure  is more powerful to use;
+  3.  recalculate the sample size in accordance to the aforesaid.
+
+
+As future step:
+
+  4. also compare the efficiency between using the composite endpoint as primary endpoint or using the composite components as co-primary endpoints. 
+  
+  <!-- (or using the relevant endpoint and the composite endpoint) as co-primary endpoints.  -->
+
+## First steps
+
+**Today's presentation** 
+
+Trial design in which \textcolor{blue}{\textbf{at the end of the study}}:
+
+  1. we evaluate whether or not to use the composite endpoint or its more relevant endpoint as primary endpoint;
+  2. we determine which testing procedure  is more powerful to use.
+  
+\bigskip  
+  
+**How can we do it?** 
+  
+  - Asymptotic Relative Efficiency (ARE) method: to decide between the composite endpoint and the relevant endpoint.
+  - Estimation of the correlation and the probabilities under the control group to calculate the ARE method.
+  
+
+## Simulation study
+
+
+We simulate a two-arm trial with two binary endpoints according to the following parameters:
+
+  - $p_1^{(0)}$: $0.1, 0.2$;
+  - $p_2^{(0)}$: $0.1, 0.25$;
+  - $OR_1$: $0.6, 0.7, 0.8$;
+  - $OR_2$: $0.75, 0.8$;
+  - $\rho$: $0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8$.  
+
+\bigskip
+
+Assumptions on the correlation
+
+- The correlation is the same in the two groups
+- Correlation bounds
+\vspace{-8mm}
+
+$$
+max(B_L(p_1^{(0)},p_2^{(0)}),B_L(p_1^{(1)},p_2^{(1)})) \leq \rho \leq min(B_U(p_1^{(0)},p_2^{(0)}),B_U(p_1^{(1)},p_2^{(1)}))
+$$
+
+## Primary endpoints
+
+Two-group comparison based on:
+
+  - the **relevant endpoint** $\rightarrow$  consider endpoint 1 as the primary endpoint;
+  - the **composite endpoint** $\rightarrow$  consider the composite endpoint as the primary endpoint;
+  - the **selected endpoint** $\rightarrow$  select the primary endpoint at the end of the trial  based on the ARE method and using blinded/unblinded data to calculate it. 
+
+We simulate $100000$ trials for each scenario and for each endpoint considered as primary endpoint
+
+
+
+## Estimation of the correlation
+
+
+**Blinded approach:**
+
+-  Using blinded data, we estimate the probabilities of the composite components and the pooled probability of the composite endpoint, and calculate afterwards the estimate of the correlation.
+
+\bigskip
+
+**Unblinded approach:**
+
+- Using unblinded data, we estimate the probabilities of the components and the composite in each group, and estimate the correlation in each treatment group. We take the mean of the two correlations.
+
+
+## Results under the alternative hypothesis ($H_1: OR_1<1, OR_2<1$)
+
+
+**Two situations** 
+
+  1. The decision does not depend on the correlation
+  2. The decision depends on the correlation 
+
+
+\bigskip
+
+
+We focus on the situation 2, and on those scenarios in which there are discrepancies between the blinded and the unblinded approaches.
+
+
+## Situation 2: The decision depends on the correlation
+
+```{r echo = F, fig.height=4}
+p <- list() 
+enum = 1 
+i <- 4
+it <-  dim(subset(dataset,dataset$scenario<i))+1
+
+  sub=subset(dataset,dataset$scenario==i)
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 4 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ub, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 4 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 4 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (CE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+  p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 4 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+
+  stable <- data.frame(Corr=sub$corr,ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),"%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)
+
+  p[[enum+4]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+5
+#   it <- it + dim(subset(dataset,dataset$scenario==i))
+# }
+marrangeGrob(p,ncol=5,nrow=1,top=NULL)
+```
+
+\scriptsize
+
+Blinded approach:
+```{r echo=F, eval=TRUE, warning=F} 
+i=34 
+estimation_b(samplesize=dataset$samplesize_e1[i]/2,
+             p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                   OR1=dataset$OR1[i],
+                                   p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                   OR2=dataset$OR2[i],
+                                   p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])
+
+
+```
+Unblinded approach:
+```{r echo=F, eval=TRUE, warning=F}
+i=34 
+estimation_ub(samplesize=dataset$samplesize_e1[i]/2,
+             p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                   OR1=dataset$OR1[i],
+                                   p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                   OR2=dataset$OR2[i],
+                                   p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])
+
+```
+
+## Situation 2: The decision depends on the correlation
+
+```{r echo = F, fig.height=4}
+p <- list() 
+enum = 1 
+
+i <- 22
+it <-  dim(subset(dataset,dataset$scenario<i))+1
+
+  sub=subset(dataset,dataset$scenario==i)
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 22 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ub, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 22 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 22 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (CE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+  p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario 22 \n (p1,p2,OR1,OR2) \n=(", dataset$p0_e1[it],",",dataset$p0_e2[it],",",dataset$OR1[it],",",dataset$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+
+  stable <- data.frame(Corr=sub$corr,ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),"%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)
+
+  p[[enum+4]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+5
+#   it <- it + dim(subset(dataset,dataset$scenario==i))
+# }
+marrangeGrob(p,ncol=5,nrow=1,top=NULL)
+```
+
+
+\scriptsize
+
+Blinded approach:
+```{r echo=F, eval=TRUE, warning=F} 
+i=162 
+estimation_b(samplesize=dataset$samplesize_e1[i]/2,
+             p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                   OR1=dataset$OR1[i],
+                                   p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                   OR2=dataset$OR2[i],
+                                   p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])
+
+
+```
+Unblinded approach:
+```{r echo=F, eval=TRUE, warning=F}
+i=162 
+estimation_ub(samplesize=dataset$samplesize_e1[i]/2,
+             p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
+                                   OR1=dataset$OR1[i],
+                                   p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
+                                   OR2=dataset$OR2[i],
+                                   p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])
+
+```
+
+## Conclusions
+
+- The powers using the selected endpoint (both blinded and unblinded approaches) are  in general larger than the ones obtained using the composite endpoint and the relevant endpoint.  
+- The significance level is similar in the four situations.
+
+\bigskip
+
+Future steps: 
+
+  - Interim stage to estimate the probabilities under the control group and the correlation, and  sample size recalculation for the selected endpoint.
+

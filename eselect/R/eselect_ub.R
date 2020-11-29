@@ -27,7 +27,7 @@
 # computation ratio sample size
 # computation statistic according to the decision
 
-eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS"){
+eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",H0=FALSE){
 
   samplesize = sum(db0)
   total_ss = 2*samplesize

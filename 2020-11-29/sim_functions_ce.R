@@ -274,7 +274,7 @@ f_sim <- function(samplesize,p_e1,p_e2,p_ce){
   s3_group = ifelse(p_ce-p_e1>0, p_ce-p_e1, 0)#p_ce-p_e1  
   s4_group = 1- p_ce  
   
-  data = rmultinom(1,samplesize,c(s1_group,s2_group,s3_group,s4_group)) 
+  data = rmultinom(n=1,size=round(samplesize),prob=c(s1_group,s2_group,s3_group,s4_group)) 
   
   return(data)
 }

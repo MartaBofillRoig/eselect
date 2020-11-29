@@ -29,6 +29,7 @@
 eselect <- function(db,p0_e1,OR1,p0_e2,OR2,criteria="SS"){
 
   total_ss = sum(db)
+  ss_arm = total_ss/2
 
   p1_e1 = (OR1*p0_e1/(1-p0_e1))/(1+(OR1*p0_e1/(1-p0_e1)))
   p1_e2 = (OR2*p0_e2/(1-p0_e2))/(1+(OR2*p0_e2/(1-p0_e2)))
@@ -47,7 +48,7 @@ eselect <- function(db,p0_e1,OR1,p0_e2,OR2,criteria="SS"){
   phat1_e2 = (OR2*phat0_e2/(1-phat0_e2))/(1+(OR2*phat0_e2/(1-phat0_e2)))
 
   # estimated correlation
-  corrhat =  (phat_ce - (samplesize/total_ss)*(1 - (1-phat0_e1)*(1-phat0_e2)) - (samplesize/total_ss)*(1-(1-phat1_e1)*(1-phat1_e2)))/(-(samplesize/total_ss)*sqrt(phat0_e1*phat0_e2*(1-phat0_e1)*(1-phat0_e2))-(samplesize/total_ss)*sqrt(phat1_e1*phat1_e2*(1-phat1_e1)*(1-phat1_e2)))
+  corrhat =  (phat_ce - (ss_arm/total_ss)*(1 - (1-phat0_e1)*(1-phat0_e2)) - (ss_arm/total_ss)*(1-(1-phat1_e1)*(1-phat1_e2)))/(-(ss_arm/total_ss)*sqrt(phat0_e1*phat0_e2*(1-phat0_e1)*(1-phat0_e2))-(ss_arm/total_ss)*sqrt(phat1_e1*phat1_e2*(1-phat1_e1)*(1-phat1_e2)))
 
   # correlation restrictions
   rest = corr_rest_b(phat0_e1,phat0_e2,p0_e1,p0_e2,p1_e1,p1_e2,OR1,OR2)
