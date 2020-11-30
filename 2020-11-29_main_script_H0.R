@@ -7,12 +7,20 @@
 
 rm(list = ls())
 
-setwd("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection")
-source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/aux_functions.R') 
-source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect.R')
-source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselectsim.R') 
-source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect_ub.R')
-source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselectsim_ub.R') 
+# setwd("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection")
+# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/aux_functions.R') 
+# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect.R')
+# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselectsim.R') 
+# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect_ub.R')
+# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselectsim_ub.R') 
+
+
+setwd("C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection")
+source('C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection/aux_functions.R') 
+source('C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect.R')
+source('C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselectsim.R') 
+source('C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect_ub.R')
+source('C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselectsim_ub.R') 
 
 ##################################################################################
 # Differences with respect to previous versions
@@ -196,8 +204,8 @@ for(i in 1:dim(dataset)[1]){
   print(i)
 }
 
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True.RData") 
- 
+# save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True.RData") 
+save.image("C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True.RData") 
 
 ######################################### 
 # Bias correlation 
