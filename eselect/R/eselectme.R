@@ -1,4 +1,4 @@
-#' eselect: Endpoint selection and sample size reassessment for composite endpoints based on blinded data
+#' eselectme: Endpoint selection and sample size reassessment for composite endpoints based on blinded data
 #'
 #' @description
 #'
@@ -26,7 +26,7 @@
 # computation sample size SS
 # computation statistic according to the decision (based on SS)
 
-eselect <- function(db,p0_e1,OR1,p0_e2,OR2,criteria="SS"){
+eselectme <- function(db,p0_e1,OR1,p0_e2,OR2){
 
   total_ss = sum(db)
   ss_arm = total_ss/2
@@ -74,37 +74,44 @@ eselect <- function(db,p0_e1,OR1,p0_e2,OR2,criteria="SS"){
                                     alpha = 0.05,
                                     beta = 0.2)
 
-  if(criteria=="SS"){
+  # criteria=="SS"
 
-    ratio_ss = samplesize_e1/samplesize_estar
+  ratio_ss = samplesize_e1/samplesize_estar
 
-    if(ratio_ss>= 1){
+  if(ratio_ss>= 1){
 
-      total_ss=samplesize_estar
-      Decision = 1
+    total_ss=samplesize_estar
+    Decision = 1
 
-    }else{
+    # Shoud we use CE and RE as multiple primary endpoints?
+    # Comparison (CE,RE) vs RE - Simulation-based
 
-      total_ss=samplesize_e1
-      Decision = 0
+    alpha= 0.05
+    z.alpha <- qnorm(1-alpha,0,1)
 
+    # simulation multiple test (adjusted bonferroni)
+    corr_struct=diag(2)
+    corr_struct[1,2]=corrhat_c
+    corr_struct[2,1]=corrhat_c
+    quant <- qmvnorm(1-alpha, corr = corr_struct, tail = "lower.tail")
+
+    # simtest_me(OR1=OR2,p0_e1=phat0_e1,OR2=OR2,p0_e2=phat0_e2,n=ss_arm)< -quant$quantile
+    power_multendpoints <- sum(replicate(nsim,(simtest_me(OR1=OR2,p0_e1=p0_e1,OR2=OR2,p0_e2=p0_e2,n=ss_arm)< -quant$quantile)>0))/nsim
+
+    # simulation composite test
+    power_CE <- sum(replicate(nsim,f_OR(samplesize=ss_arm,
+                                        p0=p0_ce,
+                                        p1=prob_cbe(p_e1=p1_e1, p_e2=p1_e2, rho=corr_struct)))< - z.alpha)/nsim
+
+    if(power_CE<power_multendpoints){
+      Decision = 2
     }
-  }
-  if(criteria=="ARE"){
 
-    ARE_up = ARE_cbe(p0_e1=phat0_e1, p0_e2=phat0_e2, eff_e1=OR1, eff_e2=OR2, rho=corrhat_c)
+  }else{
 
-    if(ARE_up>= 1){
+    total_ss=samplesize_e1
+    Decision = 0
 
-      total_ss=samplesize_estar
-      Decision = 1
-
-    }else{
-
-      total_ss=samplesize_e1
-      Decision = 0
-
-    }
   }
 
   return(list(SampleSize = total_ss, Decision = Decision))
