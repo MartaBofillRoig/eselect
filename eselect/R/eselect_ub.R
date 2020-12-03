@@ -1,6 +1,7 @@
-#' eselect_ub: Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
+#' Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
 #'
-#' @description
+#' @description Endpoint selection and sample size reassessment for composite endpoints based on unblinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function selects between the composite endpoint or the relevant endpoint as the primary endpoint of the study and recalculate the sample size accordingly. The decision criteria to decide between the composite endpoint or the relevant endpoint might be the ratio of the corresponding sample sizes ("SS") or the Asymptotic Relative Efficiency ("ARE").
+#' The algorithm of the function is the following: First, the probabilities of the composite components in the control group and the correlation between them is estimated based on unblinded data. Second, using the estimated probabilities and the estimated correlation, the decision criteria is computed and the primary endpoint is selected.  Finally, the sample size is recalculated according to the decision.
 #'
 #' @param db0 matrix
 #' @param db1 matrix
@@ -9,10 +10,12 @@
 #' @param OR1 numeric parameter, Odds ratio for the endpoint 1
 #' @param OR2 numeric parameter, Odds ratio for the endpoint 2
 #' @param criteria decision criteria to choose between the composite endpoint or the endpoint 1 as primary endpoint ("SS": Ratio sample sizes, "ARE": Asymptotic Relative Efficiency).
+#' @param alpha Type I error.
+#' @param beta Type II error.
 #'
 #' @export
 #'
-#' @return
+#' @return This function returns the decision (Decision = 1, meaning the chosen endpoint is the composite endpoint; and Decision = 0, meaning the chosen endpoint is the relevant endpoint) and the sample size according to the decision.
 #'
 #' @details
 #'
@@ -21,13 +24,9 @@
 
 
 ##############################################################
-# eselect_ub_int:
-# simulation
-# estimation correlation unblinded without previous info corr/CE
-# computation ratio sample size
-# computation statistic according to the decision
+# eselect_ub:
 
-eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",H0=FALSE){
+eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",alpha=0.05,beta=0.2){
 
   samplesize = sum(db0)
   total_ss = 2*samplesize
@@ -69,7 +68,7 @@ eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",H0=FALSE){
     corrhat_c = low
   }
 
-  samplesize_e1 = samplesize_OR(p0=phat0_e1, OR=OR1, alpha=0.05, beta=0.2)
+  samplesize_e1 = samplesize_OR(p0=phat0_e1, OR=OR1, alpha=alpha, beta=beta)
   samplesize_estar = samplesize_cbe(p0_e1=phat0_e1,p0_e2=phat0_e2,
                                     eff_e1 = OR1,
                                     effm_e1 = "or",
@@ -77,8 +76,8 @@ eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",H0=FALSE){
                                     effm_e2 = "or",
                                     effm_ce = "or",
                                     rho=corrhat_c,
-                                    alpha = 0.05,
-                                    beta = 0.2)
+                                    alpha = alpha,
+                                    beta = beta)
 
   if(criteria=="SS"){
 

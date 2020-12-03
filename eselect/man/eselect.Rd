@@ -2,9 +2,9 @@
 % Please edit documentation in R/eselect.R
 \name{eselect}
 \alias{eselect}
-\title{eselect: Endpoint selection and sample size reassessment for composite endpoints based on blinded data}
+\title{Endpoint selection and sample size reassessment for composite endpoints based on blinded data}
 \usage{
-eselect(db, p0_e1, OR1, p0_e2, OR2, criteria = "SS")
+eselect(db, p0_e1, OR1, p0_e2, OR2, criteria = "SS", alpha = 0.05, beta = 0.2)
 }
 \arguments{
 \item{db}{matrix 2x2 table (pooled sample)}
@@ -18,12 +18,17 @@ eselect(db, p0_e1, OR1, p0_e2, OR2, criteria = "SS")
 \item{OR2}{numeric parameter, Odds ratio for the endpoint 2}
 
 \item{criteria}{decision criteria to choose between the composite endpoint or the endpoint 1 as primary endpoint ("SS": Ratio sample sizes, "ARE": Asymptotic Relative Efficiency).}
+
+\item{alpha}{Type I error.}
+
+\item{beta}{Type II error.}
 }
 \value{
-
+This function returns the decision (Decision = 1, meaning the chosen endpoint is the composite endpoint; and Decision = 0, meaning the chosen endpoint is the relevant endpoint) and the sample size according to the decision.
 }
 \description{
-
+Endpoint selection and sample size reassessment for composite endpoints based on blinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function selects between the composite endpoint or the relevant endpoint as the primary endpoint of the study and recalculate the sample size accordingly. The decision criteria to decide between the composite endpoint or the relevant endpoint might be the ratio of the corresponding sample sizes ("SS") or the Asymptotic Relative Efficiency ("ARE").
+The algorithm of the function is the following: First, the probabilities of the composite components in the control group and the correlation between them is estimated based on blinded data. Second, using the estimated probabilities and the estimated correlation, the decision criteria is computed and the primary endpoint is selected.  Finally, the sample size is recalculated according to the decision.
 }
 \details{
 

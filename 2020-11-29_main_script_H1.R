@@ -49,8 +49,11 @@ OR1 = c(0.6, 0.8) #old_version c(0.6, 0.7, 0.8)
 OR2 = c(0.75, 0.8)
 p_init = c(0.5, 1)
 
-scenarios = expand_grid(p0_e1,p0_e2,OR1,OR2,p_init)
+# scenarios = expand_grid(p0_e1,p0_e2,OR1,OR2,p_init)
+# scenarios$scenario = 1:dim(scenarios)[1]
+scenarios = expand_grid(p0_e1,p0_e2,OR1,OR2)
 scenarios$scenario = 1:dim(scenarios)[1]
+scenarios = expand_grid(scenarios,p_init)
 
 # Probabilities treat group
 scenarios$p1_e1 = (scenarios$OR1*scenarios$p0_e1/(1-scenarios$p0_e1))/(1+(scenarios$OR1*scenarios$p0_e1/(1-scenarios$p0_e1)))
@@ -69,6 +72,8 @@ corr = c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8)
 
 dataset = expand_grid(scenarios, corr) 
 dataset = subset(dataset, dataset$corr < dataset$max_corr & dataset$corr > dataset$min_corr)
+
+# save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/scenarios.RData")
 
 # Calculate CE Probabilities
 dataset$p0_ce = mapply(prob_cbe, p_e1=dataset$p0_e1, p_e2=dataset$p0_e2, rho=dataset$corr)
@@ -119,7 +124,8 @@ dataset$Test_Reject_ES_ub <- NA
 set.seed(2367)
 
 # nsim: number of simulations
-nsim = 100000 
+# nsim = 100000 
+nsim = 1000#test
 
 # type i and ii errors
 z.alpha <- qnorm(1-alpha,0,1)  
@@ -303,6 +309,13 @@ for(i in 1:dim(dataset)[1]){
   dataset$decision_ES[i]<- 1-aux[2]
   print(i)
 }
+
+# i=125
+# ss_arm=round(dataset$samplesize_e1[i]/2);
+# p0_e1=dataset$p0_e1[i];OR1=dataset$OR1[i];
+# p0_e2=dataset$p0_e2[i];OR2=dataset$OR2[i];
+# p0_ce=dataset$p0_ce[i];p_init=dataset$p_init[i];
+# criteria="ARE";H0_e1=TRUE;H0_e2=FALSE
 
 for(i in 1:dim(dataset)[1]){
   aux <- rowSums(replicate(nsim,eselectsim(ss_arm=round(dataset$samplesize_e1[i]/2),

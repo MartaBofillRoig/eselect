@@ -1,17 +1,19 @@
-#' eselectme: Endpoint selection and sample size reassessment for composite endpoints based on blinded data
+#' Endpoint selection and sample size reassessment for multiple binary endpoints based on blinded data
 #'
-#' @description
+#' @description Endpoint selection and sample size reassessment for multiple binary endpoints based on blinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function selects between the composite endpoint (CE), the relevant endpoint (RE), and the multiple binary endpoints (CE and RE) as the primary endpoint(s) of the study and recalculate the sample size accordingly. The decision criteria to decide between the composite endpoint or the relevant endpoint is the ratio of the corresponding sample sizes ("SS").
+#' The algorithm of the function is the following: First, the probabilities of the composite components in the control group and the correlation between them is estimated based on blinded data. Second, using the estimated probabilities and the estimated correlation, the decision criteria is computed and the primary endpoint is selected.  Finally, the sample size is recalculated according to the decision.
 #'
 #' @param db matrix 2x2 table (pooled sample)
 #' @param p0_e1 numeric parameter, probability of occurrence E1 in the control group
 #' @param p0_e2 numeric parameter, probability of occurrence E2 in the control group
 #' @param OR1 numeric parameter, Odds ratio for the endpoint 1
 #' @param OR2 numeric parameter, Odds ratio for the endpoint 2
-#' @param criteria decision criteria to choose between the composite endpoint or the endpoint 1 as primary endpoint ("SS": Ratio sample sizes, "ARE": Asymptotic Relative Efficiency).
+#' @param alpha Type I error.
+#' @param beta Type II error.
 #'
 #' @export
 #'
-#' @return
+#' @return This function returns the decision (Decision = 2, meaning the chosen endpoint is the multiple endpoints approach; Decision = 1, meaning the chosen endpoint is the composite endpoint; and Decision = 0, meaning the chosen endpoint is the relevant endpoint) and the sample size according to the decision.
 #'
 #' @details
 #'
@@ -20,13 +22,9 @@
 
 ##############################################################
 ##############################################################
-# eselection_b:
-# simulation
-# estimation correlation blinded without previous info corr/CE
-# computation sample size SS
-# computation statistic according to the decision (based on SS)
+# eselectme
 
-eselectme <- function(db,p0_e1,OR1,p0_e2,OR2){
+eselectme <- function(db,p0_e1,OR1,p0_e2,OR2,alpha=0.05,beta=0.2){
 
   total_ss = sum(db)
   ss_arm = total_ss/2
@@ -63,7 +61,7 @@ eselectme <- function(db,p0_e1,OR1,p0_e2,OR2){
     corrhat_c = low
   }
 
-  samplesize_e1 = samplesize_OR(p0=phat0_e1, OR=OR1, alpha=0.05, beta=0.2)
+  samplesize_e1 = samplesize_OR(p0=phat0_e1, OR=OR1, alpha=alpha, beta=beta)
   samplesize_estar = samplesize_cbe(p0_e1=phat0_e1,p0_e2=phat0_e2,
                                     eff_e1 = OR1,
                                     effm_e1 = "or",
@@ -71,8 +69,8 @@ eselectme <- function(db,p0_e1,OR1,p0_e2,OR2){
                                     effm_e2 = "or",
                                     effm_ce = "or",
                                     rho=corrhat_c,
-                                    alpha = 0.05,
-                                    beta = 0.2)
+                                    alpha = alpha,
+                                    beta = beta)
 
   # criteria=="SS"
 
@@ -85,8 +83,6 @@ eselectme <- function(db,p0_e1,OR1,p0_e2,OR2){
 
     # Shoud we use CE and RE as multiple primary endpoints?
     # Comparison (CE,RE) vs RE - Simulation-based
-
-    alpha= 0.05
     z.alpha <- qnorm(1-alpha,0,1)
 
     # simulation multiple test (adjusted bonferroni)
