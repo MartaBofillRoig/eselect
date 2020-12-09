@@ -208,58 +208,6 @@ for(i in 1:dim(dataset)[1]){
 save.image("C:/Users/Marta.Bofill/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True.RData") 
 
 ######################################### 
-# Bias correlation 
-#########################################  
-
-# set.seed(42)
-
-# nsim: number of simulations
-nsim = 1000
-
-t0=Sys.time() 
-
-corr_est_ub_mean <- c()
-corr_est_ub_v <- c()
-corr_est_b_mean <- c()
-corr_est_b_v <- c()
-
-for(i in 1:dim(dataset)[1]){
-  v_ub <- replicate(nsim, estimation_ub(samplesize=dataset$samplesize_e1[i]/2,
-                                                  p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
-                                                  OR1=dataset$OR1[i],
-                                                  p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
-                                                  OR2=dataset$OR2[i],
-                                                  p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1])
-  
-  corr_est_ub_mean[i] <- mean(v_ub)
-  corr_est_ub_v[i] <- var(v_ub)
-  
-  v_b <- replicate(nsim, estimation_b(samplesize=dataset$samplesize_e1[i]/2,
-                                      p0_e1=dataset$p0_e1[i],p1_e1=dataset$p1_e1[i],
-                                      OR1=dataset$OR1[i],
-                                      p0_e2=dataset$p0_e2[i],p1_e2=dataset$p1_e2[i],
-                                      OR2=dataset$OR2[i],
-                                      p0_ce=dataset$p0_ce[i],p1_ce=dataset$p1_ce[i])[1])
-  
-  corr_est_b_mean[i] <- mean(v_b)
-  corr_est_b_v[i] <- var(v_b)
-  
-  print(i)
-}
-
-dataset$corr_est_ub_mean <- corr_est_ub_mean 
-dataset$corr_est_ub_v <- corr_est_ub_v
-dataset$corr_est_b_mean <- corr_est_b_mean
-dataset$corr_est_b_v <- corr_est_b_v
-
-dataset$biased_ub <- dataset$corr_est_ub_mean - dataset$corr
-dataset$biased_b <- dataset$corr_est_b_mean - dataset$corr
-
-summary(dataset)
-
-
-# plot()
-
 
 
 

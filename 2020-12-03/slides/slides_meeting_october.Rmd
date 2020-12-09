@@ -1,0 +1,172 @@
+---
+title: "Endpoint selection and sample size recalculation with composite binary endpoints"
+author: "Vienna-Barcelona"
+date: "`r Sys.Date()`"
+output: 
+  beamer_presentation: 
+    theme: "Boadilla"
+    colortheme: "beaver" 
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(ggpubr)
+library(tidyverse)
+library(tidyr)
+library(plyr)
+library(devtools)
+install_github("CompARE-Composite/CompARE-package")
+library(CompARE) 
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ce.R')
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+knitr::opts_chunk$set(echo = FALSE)
+set.seed(5366)
+```
+
+## Main ideas and motivation
+
+\bigskip
+
+\begin{block}{Goal}
+  
+  To define a theoretic-decision framework to add/drop components into a primary composite endpoint and to reassess the sample size accordingly.
+  
+\end{block}
+
+
+**Elements of the problem**: Trial design with an interim stage in which we:
+
+  1.  Composite binary endpoint (CE) formed by two components; 
+  2.  determine which testing procedure  is more powerful to use;
+  3.  recalculate the sample size in accordance to the aforesaid.
+
+
+As future step:
+
+  4. also compare the efficiency between using the composite endpoint as primary endpoint or using the composite components as co-primary endpoints.
+
+
+## Scheme of the problem
+
+\begin{figure}[h!] 
+	\centering
+	\includegraphics[width=0.9\linewidth]{./scheme_problem.pdf} 
+\end{figure}
+
+<!-- ![scheme_problem](scheme_problem.png) -->
+<!-- <img src="scheme_problem.png" width="40%"> -->
+
+<!-- **Our proposal**: Trial design with an interim stage in which we:  -->
+
+<!--   1.  evaluate whether or not to add/drop components into the composite endpoint; -->
+<!--   2.  determine which testing procedure  is more powerful to use; -->
+<!--   3.  recalculate the sample size in accordance to the aforesaid. -->
+
+
+<!-- As future step: -->
+
+<!--   4. also compare the efficiency between using the composite endpoint as primary endpoint or using the composite components as co-primary endpoints.  -->
+  
+  <!-- (or using the relevant endpoint and the composite endpoint) as co-primary endpoints.  -->
+
+## First steps
+
+**Today's presentation** 
+
+Trial design in which \textcolor{blue}{\textbf{at the end of the study}}:
+
+  1. we evaluate whether or not to use the composite endpoint or its more relevant endpoint as primary endpoint;
+  2. we determine which testing procedure  is more powerful to use.
+  
+\bigskip  
+  
+**How can we do it?** 
+  
+  - Asymptotic Relative Efficiency (ARE) method: to decide between the composite endpoint and the relevant endpoint.
+  - Estimation of the correlation and the probabilities under the control group to calculate the ARE method.
+
+## Decision criteria
+
+To choose which primary endpoint(s) to use, we can consider the following decision criteria:
+
+  - Asymptotic Relative Efficiency (ARE): The method is based on the comparison of the powers under sequences of local alternatives.
+  - Ratio of the sample sizes: This measure is based on the comparison of the required sample size in each design.
+  - Difference in power: This measure is based on the comparison of the empirical powers in each design (simulation-based approach).
+
+## Simulation study
+
+
+We simulate a two-arm trial with two binary endpoints according to the following parameters:
+
+  - $p_1^{(0)}$: $0.1, 0.2$;
+  - $p_2^{(0)}$: $0.1, 0.25$;
+  - $OR_1$: $0.6, 0.7, 0.8$;
+  - $OR_2$: $0.75, 0.8$;
+  - $\rho$: $0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8$.  
+
+\bigskip
+
+Assumptions on the correlation
+
+- The correlation is the same in the two groups
+- Correlation bounds
+\vspace{-8mm}
+
+$$
+max(B_L(p_1^{(0)},p_2^{(0)}),B_L(p_1^{(1)},p_2^{(1)})) \leq \rho \leq min(B_U(p_1^{(0)},p_2^{(0)}),B_U(p_1^{(1)},p_2^{(1)}))
+$$
+
+## Primary endpoints
+
+Two-group comparison based on:
+
+  - the **relevant endpoint** $\rightarrow$  consider endpoint 1 as the primary endpoint;
+  - the **composite endpoint** $\rightarrow$  consider the composite endpoint as the primary endpoint;
+  - the **selected endpoint** $\rightarrow$  select the primary endpoint at the end of the trial  based on the ARE method and using blinded/unblinded data to calculate it. 
+
+We simulate $100000$ trials for each scenario and for each endpoint considered as primary endpoint
+
+
+
+## Estimation of the correlation
+
+
+**Blinded approach:**
+
+-  Using blinded data, we estimate the probabilities of the composite components and the pooled probability of the composite endpoint, and calculate afterwards the estimate of the correlation.
+
+\bigskip
+
+**Unblinded approach:**
+
+- Using unblinded data, we estimate the probabilities of the components and the composite in each group, and estimate the correlation in each treatment group. We take the mean of the two correlations.
+
+
+## Results under the alternative hypothesis ($H_1: OR_1<1, OR_2<1$)
+
+
+**Two situations** 
+
+  1. The decision does not depend on the correlation
+  2. The decision depends on the correlation 
+
+
+\bigskip
+
+
+We focus on the situation 2, and on those scenarios in which there are discrepancies between the blinded and the unblinded approaches. 
+
+
+## Conclusions
+
+- The powers using the selected endpoint (both blinded and unblinded approaches) are  in general larger than the ones obtained using the composite endpoint and the relevant endpoint.  
+- The significance level is similar in the four situations.
+
+\bigskip
+
+Future steps: 
+
+  - Interim stage to estimate the probabilities under the control group and the correlation, and  sample size recalculation for the selected endpoint.
+

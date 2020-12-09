@@ -308,14 +308,7 @@ for(i in 1:dim(dataset)[1]){
   dataset$Test_Power_ES[i]<- aux[1]
   dataset$decision_ES[i]<- 1-aux[2]
   print(i)
-}
-
-# i=125
-# ss_arm=round(dataset$samplesize_e1[i]/2);
-# p0_e1=dataset$p0_e1[i];OR1=dataset$OR1[i];
-# p0_e2=dataset$p0_e2[i];OR2=dataset$OR2[i];
-# p0_ce=dataset$p0_ce[i];p_init=dataset$p_init[i];
-# criteria="ARE";H0_e1=TRUE;H0_e2=FALSE
+} 
 
 for(i in 1:dim(dataset)[1]){
   aux <- rowSums(replicate(nsim,eselectsim(ss_arm=round(dataset$samplesize_e1[i]/2),
