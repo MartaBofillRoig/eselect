@@ -1,0 +1,256 @@
+---
+title: "Endpoint selection and sample size recalculation with composite binary endpoints"
+author: "Vienna-Barcelona"
+date: "`r Sys.Date()`"
+output: 
+  beamer_presentation: 
+    theme: "Boadilla"
+    colortheme: "beaver" 
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(ggpubr)
+library(tidyverse)
+library(tidyr)
+library(plyr)
+library(devtools)
+# install_github("CompARE-Composite/CompARE-package")
+# library(CompARE) 
+# source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/sim_functions_ce.R')
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+# load("C:/Users/Marta/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0_True.RData")
+knitr::opts_chunk$set(echo = FALSE)
+set.seed(5366)
+```
+
+## Main ideas and motivation
+
+\bigskip
+
+\begin{block}{Goal}
+  
+  To define a theoretic-decision framework to add/drop components into a primary composite endpoint and to reassess the sample size accordingly.
+  
+\end{block}
+
+\medskip
+
+\begin{itemize}
+  \item Assume composite binary  endpoint (CE) formed by two components; 
+  \item Suppose that the  Endpoint 1 (called relevant endpoint (RE)) is more relevant than Endpoint 2.
+\end{itemize}
+
+\medskip
+
+**Trial design with an interim stage in which we:**
+
+  1.  select the most efficient endpoint to be used as the primary endpoint; 
+  2.  determine which testing procedure  is more powerful to use;
+  3.  recalculate the sample size in accordance to the aforesaid. 
+
+
+## Scheme of the problem
+
+\begin{figure}[h!] 
+	\centering
+	\includegraphics[width=0.9\linewidth]{./scheme_problem.pdf} 
+\end{figure}
+
+## Where are we? -- Last meeting (October 29, 2020) 
+
+\begin{block}{}
+Trial design in which \textcolor{blue}{\textbf{at the end of the study}} we evaluate whether to use the CE or the RE as primary endpoint;
+\end{block}
+
+<!-- Trial design in which \textcolor{blue}{\textbf{at the end of the study}}: -->
+  <!-- 1. we evaluate whether to use the CE or the RE as primary endpoint; -->
+  <!-- 2. we determine which testing procedure  is more powerful to use. -->
+  
+\small \pause 
+  
+**What we did:** 
+
+  - Asymptotic Relative Efficiency (ARE) method: to decide between the composite endpoint and the relevant endpoint.
+  - Estimation of the correlation and the probabilities under the control group to calculate the ARE method.
+  
+\pause 
+  
+**Some conclusions and ideas:** 
+  
+  - ARE method was not selecting the most powerful design when ARE$\approx 1$.
+  <!-- the ARE value was in the vicinity of 1.  -->
+  <!-- (i.e., when both designs had similar powers). -->
+  - Use the **ratio of sample sizes** as the decision criteria, and compare the results with the ones obtained using the ARE criteria.
+  - Implement the **sample size reassessment** and include an **interim stage**.
+  <!-- and estimate the parameters at an **interim stage**. -->
+  - Consider also the comparison in efficiency of the composite design versus the **multiple endpoint approach**.
+  
+\normalsize  
+  
+## Today's presentation
+
+\begin{block}{}
+1) \textbf{Simulation results}:  Evaluate whether to use the CE or the RE
+\end{block}
+
+<!-- Objective: Evaluate whether to use the composite endpoint or its more relevant endpoint as primary endpoint. -->
+
+\small
+
+**Trial designs with: **
+<!-- in which \textcolor{blue}{\textbf{at the end of the study}}: -->
+
+  (Potential) Interim stage:
+  
+   \begin{itemize}
+    \item Decision based on blinded/unblinded data using 50\% of the initial sample size
+    \item Decision based on blinded/unblinded data using 100\%  initial sample size
+   \end{itemize}
+    
+  (Potential) Sample size reassessment
+  
+  \begin{itemize}
+    \item With sample size recalculation based on the decision.
+    \item Without sample size recalculation after the decision.
+   \end{itemize} 
+
+\pause 
+  
+\begin{block}{}
+2) \textbf{Sketch for comparison between multiple endpoints and composite endpoint approaches} 
+\end{block}  
+
+\normalsize
+
+## Simulations without sample size reassessment
+
+\small
+
+Two-group comparison based on:
+
+  - the **relevant endpoint** $\rightarrow$  Endpoint 1 as the primary endpoint;
+  - the **composite endpoint** $\rightarrow$ Composite endpoint as the primary endpoint;
+  - the **selected endpoint** $\rightarrow$  Select the primary endpoint based on the decision criteria and using blinded/unblinded data. 
+
+\pause
+
+**Decision criteria**
+
+To choose which primary endpoint(s) to use, we consider:
+
+  - ARE method:  comparison of the powers under sequences of local alternatives.
+  - Ratio of the sample sizes:  comparison of the required sample sizes. 
+
+
+\pause
+
+We simulate $100000$ trials for each scenario, for each decision criteria and for each endpoint considered as primary endpoint.
+
+The sample size is calculated to have $0.80$ power to detect an effect of $OR_1$ on the endpoint 1 (**RE**) at significance level $\alpha = 0.05$. 
+
+\normalsize
+
+
+## Simulations with sample size reassessment
+
+
+\small
+
+Two-group comparison based on:
+
+  - the **relevant endpoint** $\rightarrow$  Endpoint 1 as the primary endpoint;
+  - the **composite endpoint** $\rightarrow$ Composite endpoint as the primary endpoint;
+  - the **selected endpoint** $\rightarrow$  Select the primary endpoint based on the decision criteria and using blinded/unblinded data. 
+
+
+**Decision criteria**
+
+<!-- To choose which primary endpoint(s) to use, we consider: -->
+
+  - ARE method:  comparison of the powers under sequences of local alternatives.
+  - Ratio of the sample sizes:  comparison of the required sample sizes. 
+
+We simulate $100000$ trials for each scenario, for each decision criteria and for each endpoint considered as primary endpoint.
+
+\pause
+
+\textcolor{red}{
+The sample size is calculated to have $0.80$ power to detect an effect of $OR_*$ on the \textbf{CE} at significance level $\alpha = 0.05$.  $OR_*$ is computed based on the parameters of the composite components and assuming correlation equal 0.}
+
+
+\normalsize
+
+## Conclusions simulation study
+
+Conclusions:
+
+  - The powers using the selected endpoint (both blinded and unblinded approaches) are larger than the ones obtained using the composite endpoint and the relevant endpoint.  
+  - In general, it works better the blinded approach.
+  - The significance level is slightly larger than $\alpha =0.05$ when using the unblinded approach.
+  - The power in the unblinded approach is in general larger than $1-\beta=0.80$ when recalculating the sample size.
+  - The decision based on the ARE and ratio of the sample sizes is generally the same, with the exception of some cases where ARE$\approx 0.95$ and SS$\approx 1$.
+
+## Comparison  multiple endpoint vs composite endpoint 
+
+\small
+
+We want to compare the efficiency of two designs:
+
+  <!-- - the **relevant endpoint** $\rightarrow$  consider endpoint 1 as the primary endpoint; -->
+  
+  - the **composite endpoint** $\rightarrow$  CE as the primary endpoint;
+  - the **multiple endpoints** $\rightarrow$  CE and the RE as multiple primary endpoints.
+
+\pause 
+
+**Sketch algorithm for comparing the efficiency of multiple endpoints vs composite endpoints:**
+  
+  - Simulation-based approach to decide between multiple endpoints and composite endpoints:
+    
+      - Estimate the correlation and probabilities under control group
+      - Calculate the critical values for the adjusted Bonferroni[^1] 
+      - Estimate the power for both designs
+      
+  - Sample size recalculation for the multiple endpoints \textcolor{red}{  $\rightarrow$ ??}
+  
+  [^1]: Bretz, F., Posch, M., Glimm, E., Klinglmueller, F., Maurer, W., & Rohmeyer, K. (2011). Graphical approaches for multiple comparison procedures using weighted Bonferroni, Simes, or parametric tests. BiomJ.
+
+\normalsize
+
+## Structure of the paper and R package
+
+**Proposed structure**
+
+1. Notation
+
+2. Family hypotheses and test statistics
+
+3. Decision criteria
+
+4. Endpoint selection and sample size reassessment
+
+5. \texttt{eselect} package in R (R pkg, Vignette and Examples)
+
+6. Simulations
+
+7. Discussion
+
+\begin{alertblock}{}
+To think about: Journal?
+\end{alertblock}
+
+
+## To do list
+
+- Decision criteria: ARE vs Ratio sample sizes. Review references Ryan et al. [^2],[^3] and Cuzick [^4].
+- Try different ARE approximations.
+- Implement sample size recalculation for multiple binary endpoints and run simulations.
+
+[^2]: Lefkopoulou, M., & Ryan, L. (1993). Global Tests for Multiple Binary Outcomes. Biometrics.
+
+[^3]: Legler, J. M., Lefkopoulou, M., & Ryan, L. (1995). Efficiency and Power of Tests for Multiple Binary Outcomes. JASA.
+
+[^4]: Cuzick, J. (1982). The Efficiency of the Proportions Test and the Logrank Test for Censored Survival Data. Biometrics. 
+

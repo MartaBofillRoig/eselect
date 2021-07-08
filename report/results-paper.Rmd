@@ -1,0 +1,594 @@
+---
+title: "PAPER -- simulation results"
+author: ""
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    code_folding: hide 
+    theme: readable
+    # journal, readable, paper 
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(ggpubr)
+library(tidyverse) 
+
+rm(list = ls())
+
+# Datasets
+
+# Under H0
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True.RData") 
+dataset_H0True = dataset 
+
+names(dataset_H0True)[names(dataset_H0True)=="Test_Power_ES"] <- 'Test_Reject_ES'
+names(dataset_H0True)[names(dataset_H0True)=="Test_Power_ES_SS"] <- 'Test_Reject_ES_SS'
+names(dataset_H0True)[names(dataset_H0True)=="Test_Power_ES_ub"] <- 'Test_Reject_ES_ub'
+names(dataset_H0True)[names(dataset_H0True)=="Test_Power_ES_ubSS"] <- 'Test_Reject_ES_ubSS'
+names(dataset_H0True)[names(dataset_H0True)=="Test_Power_CE"] <- 'Test_Reject_CE'
+names(dataset_H0True)[names(dataset_H0True)=="Test_Power_RE"] <- 'Test_Reject_RE'
+
+# Under H1 (only effect on one component) 
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True_e2_new.RData")
+
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True_e2.RData")
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True_e1.RData")
+dataset_SSadd=dataset
+
+# Under H1
+
+load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False.RData")
+
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False_withoutss_new.RData")
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False.RData")
+dataset_H0False = dataset 
+
+# 
+
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False_withss_new.RData")
+# dataset_H0False_ss = dataset 
+
+# 
+
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/scenarios.RData")
+# dataset_H0False$scenario = dataset$scenario 
+# dataset_H0False_ss$scenario = dataset$scenario  
+
+# 
+rm(dataset)
+
+# 
+# load("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_bias.RData") 
+
+# 
+
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+# Changelog
+
+Main modifications with respect to previous versions:
+
+2020-11-30
+
+  - We evaluate the efficiency and select the corresponding primary endpoint at interim stage.
+  - We recalculate the sample size after the decision. 
+
+2020-11-06
+
+  - We compare two decision criteria: ARE and Ratio Sample Sizes.
+  - We evaluate the power when one of the composite components has no treatment effect. See section 2.1.
+
+2020-10-30
+
+  - We have added new constraints on the possible correlation values. See sections 2.3 and 2.4. 
+  - Correction on the correlation estimator in the blinded approach. See overleaf document for further details.
+  - Study on the bias of the correlation estimator. See section 5. 
+  
+
+2020-09-24
+
+  - The scenarios we considered for the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) are a subset of the previous version, while for the correlation  ($\rho$) we have added more values. 
+  - For the endpoint selection, we estimate the correlation at the end of the study based on two different approaches: i) using blinded data; and ii) using unblinded data. See section 2.2. for further explanation. We remark that in contrast with the previous version, we do not use the expected effect on the composite endpoint to estimate the correlation. 
+
+# Design and main assumptions
+
+We simulate a two-arm trial with two binary endpoints according to the following parameters:
+
+  - Probability endpoint 1 control group ($p_1^{(0)}$): $0.1, 0.2$;
+  - Probability endpoint 2 control group ($p_2^{(0)}$): $0.1, 0.25$;
+  - Odds ratio endpoint 1 ($OR_1$): $0.6, 0.8$;
+  - Odds ratio endpoint 2 ($OR_2$): $0.75, 0.8$;
+  - Correlation between endpoints ($\rho$): $0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8$;
+  - Percentage interim analysis ($p_{init}$): $0.5$, $1.0$. (That is: or 50\% of the initial sample size is used as interim or 100\% is used.)
+
+The correlation between the endpoints is assumed to be equal for both groups. We note that since the correlation is bounded between two values defined by ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$), not all the combinations of  ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$)  are possible. We calculate the correlation bounds for each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and discard those scenarios in which the correlation is not within the valid range. The total number of scenarios is $183$.
+
+We consider the composite binary endpoint formed by endpoints 1 and 2. 
+Based on the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$), we compute:
+
+  - Probability composite endpoint control group ($p_*^{(0)}$);
+  - Odds ratio composite endpoint ($OR_*$);
+  
+
+
+## Decision criterias  
+  
+We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2.
+
+
+**ARE Method**:
+
+We consider the Asymptotic Relative Efficiency (ARE) method to quantify the efficiency of using the composite endpoint over the endpoint 1 as primary endpoint of the trial. Based on the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$), we compute:
+
+  - ARE value;
+  - ARE Decision: *CE*, if the composite endpoint is preferred; *RE*, if the endpoint 1 is preferred.
+
+**Ratio Sample sizes**:
+
+We calculate the sample size to have $0.80$ power to detect an effect of $OR_1$ on the endpoint 1, given the probability $p_1^{(0)}$ under the control group,  at significance level $\alpha = 0.05$, say $n_1$. 
+
+We also calculate the sample size  to have $0.80$ power to detect an effect of $OR_*$ on the composite endpoint, given the probability $p_*^{(0)}$ under the control group, at significance level $\alpha = 0.05$, say $n_*$. Note that for calculating the sample size for the composite endpoint have been used the values of the parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$).
+
+The decision criteria is the ratio of the two sample sizes:
+
+$$n_1 / n_*$$
+
+so that if the ratio is smaller than $1$, we use the relevant endpoint; whereas if the ratio is larger than $1$, we use the composite endpoint.
+
+
+## Cases under study
+
+We evaluate through simulations the statistical power and significance level under different situations and using different primary endpoints.
+
+For each scenario, we compare the two groups based on three endpoints:
+
+  - the relevant endpoint: we consider endpoint 1 as the primary endpoint;
+  - the composite endpoint: we consider the composite endpoint formed by the union of endpoint 1 and endpoint 2 as the primary endpoint;
+  - the selected endpoint: we select the primary endpoint at the end of the trial. We do so based on the ARE method and using blinded/unblinded data to estimate the probabilities under the control group and the correlation. 
+  
+Remark:   we simulate $100000$ trials for each scenario and for each endpoint considered as primary endpoint;  
+
+For each scenario, we evaluate the following cases:
+
+  1. Under alternative hypothesis ($H_1$):
+  
+      a. testing the group differences based on the endpoint 1.
+      b. testing the group differences based on the composite endpoint. 
+      c. testing the group differences based on the selected endpoint.
+  
+  2. Under the null hypothesis ($H_0$): 
+  
+      a. testing the group differences based on the endpoint 1.
+      b. testing the group differences based on the composite endpoint. 
+      c. testing the group differences based on the selected endpoint.
+
+When simulating under $H_0$, we consider $OR_1=OR_2=1$; whereas when simulating under $H_1$,
+we consider the following situations: 
+
+  - Effect on both composite components: That is, we consider the previous mentioned values for $OR_1$, $OR_2$, and the resulting $OR_*$.
+  - Effect on only one component: That is, we plan the trial based on the previous mentioned values $OR_1$, $OR_2$, and the resulting $OR_*$, but we simulate that $OR_1=1$ or $OR_2=1$.
+
+## Estimation correlation and ARE recalculation
+
+We consider two different approaches for estimating the correlation between the endpoints 1 and 2.
+
+**Blinded approach**:
+
+Based on the observed responses in the pooled sample, we estimate the probabilities $p_1$, $p_2$, and $p_*$, where $p_k=\pi p_k^{(0)} + (1-\pi)p_k^{(1)}$ for $k=1,2,*$  and $\pi=n^{(0)}/n$.
+Assuming the expected effects for the endpoints 1 and 2  (say $OR_1$ and $OR_2$) pre-specified in advance, we obtain estimates of the probabilities of each composite component under the control group $p_1^{(0)},p_2^{(0)}$ and subsequently the estimates of the probabilities under the  treatment group $p_1^{(1)},p_2^{(1)}$.
+
+Using the estimated probabilities for each composite component in each group ($p_1^{(0)},p_2^{(0)},p_1^{(1)},p_2^{(1)}$) and using the estimated pooled probability of the composite endpoint ($p_*$), we get an estimate of the correlation.
+
+We calculate the ARE by using the estimated probabilities $p_1^{(0)},p_2^{(0)}$ and the estimated correlation.
+
+
+**Unblinded approach**:
+
+Based on the observed responses in patients in the control group, we estimate the probabilities $p_1^{(0)},p_2^{(0)},p_*^{(0)}$. Then, using these estimated probabilities, we obtain an estimate of the correlation between the Endpoints 1 and 2 in the control group $\rho^{(0)}$.
+
+We do the same for the treatment group, and then we obtain an estimate of the correlation in the treatment group $\rho^{(1)}$.
+
+We calculate the ARE by using the estimated probabilities $p_1^{(0)},p_2^{(0)}$ and the mean of the two estimates of the correlation.
+
+
+## Correlation bounds
+
+As mentioned before, 
+Pearson correlation coefficient between two binary endpoints takes values between two bounds: denote by $B_L(\cdot)$ the lower bound, and by $B_U(\cdot)$ the upper bound. Both $B_L(\cdot)$ and $B_U(\cdot)$ are functions of  the marginal probabilities of the binary endpoints.
+
+Thus, in our context, the correlation between endpoints 1 and 2 in the control group lies within $B_L(p_1^{(0)},p_2^{(0)})$ and $B_U(p_1^{(0)},p_2^{(0)})$; whereas the correlation between them in the treatment group takes values between  $B_L(p_1^{(1)},p_2^{(1)})$ and $B_U(p_1^{(1)},p_2^{(1)})$.
+
+Since we assume that the correlation is the same in both treatment groups, we require that:
+
+$$
+max(B_L(p_1^{(0)},p_2^{(0)}),B_L(p_1^{(1)},p_2^{(1)})) \leq \rho \leq min(B_U(p_1^{(0)},p_2^{(0)}),B_U(p_1^{(1)},p_2^{(1)}))
+$$
+
+In the estimation approaches explained above, we compute the correlation bounds based on the estimated probabilities and force the estimated correlation to take values within this interval. 
+We notice that this interval can be different from the one calculated based on the true probabilities (those used to run the simulations). 
+
+
+# Results under alternative hypothesis ($H_1$)
+
+
+
+## Comparing empirical powers without sample size reassessment
+
+The sample size used for the simulation is calculated to have $0.80$ power to detect an effect of $OR_1$ on the endpoint 1 at significance level $\alpha = 0.05$. 
+
+We summarize the sample sizes used for the scenarios: 
+
+```{r}
+summary(dataset_H0False[,21])
+```
+
+
+The following figure illustrates the empirical power we obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (SE). 
+```{r, warning=F}
+
+# subd=dataset#subset(dataset,is.na(dataset$Test_Power_ES_ub)==F)
+
+power_data <- data.frame(Power=c(dataset_H0False$Test_Power_ES,dataset_H0False$Test_Power_ES_ub,
+                                 dataset_H0False$Test_Power_CE,dataset_H0False$Test_Power_RE),
+                         Endpoint=c(rep("SE",length(dataset_H0False$Test_Power_ES)),
+                                    rep("SE_ub",length(dataset_H0False$Test_Power_ES_ub)),
+                                    rep("CE",length(dataset_H0False$Test_Power_CE)),
+                                    rep("RE",length(dataset_H0False$Test_Power_RE)))
+                         )
+
+ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot()
+```
+
+### Without interim analysis
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$), we plot the empirical power for each design -Selected Endpoint with blinded estimation (SE), Selected Endpoint with unblinded estimation (SE_u), Composite Endpoint (CE), and Relevant Endpoint (RE)- according to the correlation $\rho$. 
+In the empirical powers for the Selected Endpoint, we plot the points in different colors depending on which  endpoint would have been chosen using  the ARE calculated from the *true* parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$).
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$),
+we also present a table with: 
+
+  1. **Corr**: The values considered for the correlation in this scenario;
+  2. **ARE**: The value of the ARE computed using the parameters used in the design, i.e., ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and $\rho$;
+  3. **SS**: The value of the ratio of the sample sizes computed using the parameters used in the design, i.e., ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and $\rho$;
+  4. **%CE**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using blinded data; 
+  5. **%CE_u**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using unblinded data.
+
+```{r, fig.height=4, fig.width=10, warning=FALSE} 
+p <- list() 
+enum = 1 
+it <- 1
+for(i in 1:max(dataset_H0False$scenario)){
+  sub=subset(dataset_H0False,dataset_H0False$scenario==i & dataset_H0False$p_init==1.0) 
+  # 
+  
+  # 
+  p[[enum+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  p[[enum+4]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (CE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+  p[[enum+5]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+
+  stable <- data.frame(Corr=sub$corr, 
+                       ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),
+                       "%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)  
+
+  p[[enum+6]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+  
+  stable <- data.frame(Corr=sub$corr, 
+                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
+                       "%CE_u"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)  
+
+  p[[enum+7]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+8 
+  it <- it + dim(subset(dataset_H0False,dataset_H0False$scenario==i))
+}
+marrangeGrob(p,ncol=4,nrow=1,top=NULL) 
+# ,heights = c(5, 10)
+```
+
+### With interim analysis
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$), we plot the empirical power for each design -Selected Endpoint with blinded estimation (SE), Selected Endpoint with unblinded estimation (SE_u), Composite Endpoint (CE), and Relevant Endpoint (RE)- according to the correlation $\rho$. 
+In the empirical powers for the Selected Endpoint, we plot the points in different colors depending on which  endpoint would have been chosen using  the ARE calculated from the *true* parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$).
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$),
+we also present a table with: 
+
+  1. **Corr**: The values considered for the correlation in this scenario;
+  2. **ARE**: The value of the ARE computed using the parameters used in the design, i.e., ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and $\rho$;
+  3. **%CE**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using blinded data; 
+  4. **%CE_u**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using unblinded data.
+
+```{r, fig.height=4, fig.width=10, warning=FALSE} 
+p <- list() 
+enum = 1 
+it <- 1
+for(i in 1:max(dataset_H0False$scenario)){
+  sub=subset(dataset_H0False,dataset_H0False$scenario==i & dataset_H0False$p_init==0.5)
+  # 
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ub, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  p[[enum+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  p[[enum+4]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (CE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+  p[[enum+5]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False$p0_e1[it],",",dataset_H0False$p0_e2[it],",",dataset_H0False$OR1[it],",",dataset_H0False$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+
+  stable <- data.frame(Corr=sub$corr, 
+                       ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),
+                       "%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)  
+
+  p[[enum+6]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+  
+  stable <- data.frame(Corr=sub$corr, 
+                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
+                       "%CE_u"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)  
+
+  p[[enum+7]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+8 
+  it <- it + dim(subset(dataset_H0False,dataset_H0False$scenario==i))
+}
+marrangeGrob(p,ncol=4,nrow=1,top=NULL) 
+# ,heights = c(5, 10)
+```
+
+
+## Comparing empirical powers with sample size reassessment
+
+The sample size used for the simulation is calculated to have $0.80$ power to detect an effect of $OR_*$ on the composite endpoint at significance level $\alpha = 0.05$.
+The odds ratio $OR_*$ is computed based on the parameters of the composite components and assuming correlation equal 0. 
+
+We summarize the sample sizes used for the scenarios: 
+
+```{r}
+# summary(dataset_H0False_ss[,c(21,22)])
+summary(dataset_H0False_ss[,c(18,22)])
+```
+
+
+The following figure illustrates the empirical power we obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (SE). 
+```{r, warning=F}
+
+# subd=dataset#subset(dataset,is.na(dataset$Test_Power_ES_ub)==F)
+
+power_data <- data.frame(Power=c(dataset_H0False_ss$Test_Power_ES,dataset_H0False_ss$Test_Power_ES_ub,
+                                 dataset_H0False_ss$Test_Power_CE,dataset_H0False_ss$Test_Power_RE),
+                         Endpoint=c(rep("SE",length(dataset_H0False_ss$Test_Power_ES)),
+                                    rep("SE_ub",length(dataset_H0False_ss$Test_Power_ES_ub)),
+                                    rep("CE",length(dataset_H0False_ss$Test_Power_CE)),
+                                    rep("RE",length(dataset_H0False_ss$Test_Power_RE)))
+                         )
+
+ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot()
+```
+
+### Without interim analysis
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$), we plot the empirical power for each design -Selected Endpoint with blinded estimation (SE), Selected Endpoint with unblinded estimation (SE_u), Composite Endpoint (CE), and Relevant Endpoint (RE)- according to the correlation $\rho$. 
+In the empirical powers for the Selected Endpoint, we plot the points in different colors depending on which  endpoint would have been chosen using  the ARE calculated from the *true* parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$).
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$),
+we also present a table with: 
+
+  1. **Corr**: The values considered for the correlation in this scenario;
+  2. **ARE**: The value of the ARE computed using the parameters used in the design, i.e., ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and $\rho$;
+  3. **SS**: The value of the ratio of the sample sizes computed using the parameters used in the design, i.e., ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and $\rho$;
+  4. **%CE**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using blinded data; 
+  5. **%CE_u**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using unblinded data.
+
+```{r, fig.height=4, fig.width=10, warning=FALSE} 
+p <- list() 
+enum = 1 
+it <- 1
+for(i in 1:max(dataset_H0False_ss$scenario)){
+  sub=subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i & dataset_H0False_ss$p_init==1.0) 
+  # 
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ub, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  p[[enum+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  p[[enum+4]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (CE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+  p[[enum+5]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+
+  stable <- data.frame(Corr=sub$corr, 
+                       ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),
+                       "%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)  
+
+  p[[enum+6]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+  
+  stable <- data.frame(Corr=sub$corr, 
+                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
+                       "%CE_u"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)  
+
+  p[[enum+7]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+8 
+  it <- it + dim(subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i))
+}
+marrangeGrob(p,ncol=4,nrow=1,top=NULL) 
+# ,heights = c(5, 10)
+```
+
+### With interim analysis
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$), we plot the empirical power for each design -Selected Endpoint with blinded estimation (SE), Selected Endpoint with unblinded estimation (SE_u), Composite Endpoint (CE), and Relevant Endpoint (RE)- according to the correlation $\rho$. 
+In the empirical powers for the Selected Endpoint, we plot the points in different colors depending on which  endpoint would have been chosen using  the ARE calculated from the *true* parameters ($p_1^{(0)},p_2^{(0)},OR_1,OR_2,\rho$).
+
+For each combination of ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$),
+we also present a table with: 
+
+  1. **Corr**: The values considered for the correlation in this scenario;
+  2. **ARE**: The value of the ARE computed using the parameters used in the design, i.e., ($p_1^{(0)},p_2^{(0)},OR_1,OR_2$) and $\rho$;
+  3. **%CE**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using blinded data; 
+  4. **%CE_u**: The percentage of cases over the 100000 replications in which the selected endpoint was the composite endpoint using unblinded data.
+
+```{r, fig.height=4, fig.width=10, warning=FALSE} 
+p <- list() 
+enum = 1 
+it <- 1
+for(i in 1:max(dataset_H0False_ss$scenario)){
+  sub=subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i & dataset_H0False_ss$p_init==0.5)
+  # 
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ub, color=as.factor(decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  p[[enum+2]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+3]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  # 
+  p[[enum+4]] <-ggplot(sub, aes(x=corr, y=Test_Power_CE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (CE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+  p[[enum+5]] <-ggplot(sub, aes(x=corr, y=Test_Power_RE))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (RE)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9))
+
+  stable <- data.frame(Corr=sub$corr, 
+                       ARE=round(sub$ARE,2),"%CE"=round(100*sub$decision_ES,2),
+                       "%CE_u"=round(100*sub$decision_ES_ub,2),check.names=FALSE)  
+
+  p[[enum+6]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+  
+  stable <- data.frame(Corr=sub$corr, 
+                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
+                       "%CE_u"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)  
+
+  p[[enum+7]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+8 
+  it <- it + dim(subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i))
+}
+marrangeGrob(p,ncol=4,nrow=1,top=NULL) 
+# ,heights = c(5, 10)
+```
+
+
+
+## Additional scenarios (effect only on the relevant endpoint)
+
+### Without interim
+
+```{r, fig.height=4, fig.width=10, warning=FALSE}
+p <- list()
+enum = 1
+it <- 1
+for(i in 1:max(dataset_SSadd$scenario)){
+  sub=subset(dataset_SSadd,dataset_SSadd$scenario==i & dataset_SSadd$p_init==1.0)
+
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_SSadd$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_SSadd$p0_e1[it],",",dataset_SSadd$p0_e2[it],",",dataset_SSadd$OR1[it],",",dataset_SSadd$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_SSadd$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_SSadd$p0_e1[it],",",dataset_SSadd$p0_e2[it],",",dataset_SSadd$OR1[it],",",dataset_SSadd$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+
+  stable <- data.frame(Corr=sub$corr,
+                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
+                       "%CE_u"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)
+
+  p[[enum+2]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+3
+  it <- it + dim(subset(dataset_SSadd,dataset_SSadd$scenario==i))
+}
+marrangeGrob(p,ncol=3,nrow=1,top=NULL)
+```
+
+### With interim
+
+```{r, fig.height=4, fig.width=10, warning=FALSE}
+p <- list()
+enum = 1
+it <- 1
+for(i in 1:max(dataset_SSadd$scenario)){
+  sub=subset(dataset_SSadd,dataset_SSadd$scenario==i & dataset_SSadd$p_init==0.5) 
+
+  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_SSadd$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_SSadd$p0_e1[it],",",dataset_SSadd$p0_e2[it],",",dataset_SSadd$OR1[it],",",dataset_SSadd$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+  p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_SSadd$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_SSadd$p0_e1[it],",",dataset_SSadd$p0_e2[it],",",dataset_SSadd$OR1[it],",",dataset_SSadd$OR2[it],")"))+geom_point(size=2)  + labs(y = "Empirical Power (ES, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
+
+  stable <- data.frame(Corr=sub$corr,
+                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
+                       "%CE_u"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)
+
+  p[[enum+2]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
+
+  enum=enum+3
+  it <- it + dim(subset(dataset_SSadd,dataset_SSadd$scenario==i))
+}
+marrangeGrob(p,ncol=3,nrow=1,top=NULL)
+```
+
+# Results under the null hypothesis ($H_0$)
+
+## Cases (2a), (2b), and (2c)
+
+
+The following boxplots show the significance level obtained using the composite endpoint (CE), the endpoint 1 (RE) or the selected endpoint (SE).
+```{r, warning=F}
+signlevel_data <- data.frame(signlevel=c(dataset_H0True$Test_Reject_ES,
+                                         dataset_H0True$Test_Reject_ES_ub,
+                                         dataset_H0True$Test_Reject_ES_SS,
+                                         dataset_H0True$Test_Reject_ES_ubSS,
+                                         dataset_H0True$Test_Reject_CE,dataset_H0True$Test_Reject_RE),
+                             Endpoint=c(rep("SE",length(dataset_H0True$Test_Reject_ES)),
+                                        rep("SE(ub)",length(dataset_H0True$Test_Reject_ES_ub)),
+                                        rep("SE (ss/b)",length(dataset_H0True$Test_Reject_ES_SS)),
+                                        rep("SE (ss/ub)",length(dataset_H0True$Test_Reject_ES_ubSS)),
+                                        rep("CE",length(dataset_H0True$Test_Reject_CE)),
+                                        rep("RE",length(dataset_H0True$Test_Reject_RE)))
+                             )
+
+ggplot(signlevel_data, aes(x=Endpoint, y=signlevel)) + geom_boxplot()
+```
+
+General summary:
+```{r}
+subset_h0 <- data.frame(Test_Reject_ES=dataset_H0True$Test_Reject_ES,
+                   Test_Reject_ES_ub=dataset_H0True$Test_Reject_ES_ub,
+                   Test_Reject_ES_SS=dataset_H0True$Test_Reject_ES_SS,
+                   Test_Reject_ES_ubSS=dataset_H0True$Test_Reject_ES_ubSS,
+                   Test_Reject_CE=dataset_H0True$Test_Reject_CE,
+                   Test_Reject_RE=dataset_H0True$Test_Reject_RE
+)
+summary(subset_h0)
+
+```
+
+Summary cases type 1 error rate$>0.055$ with SE(ub):
+```{r}
+summary(subset(dataset_H0True,dataset_H0True$Test_Reject_ES_ubSS>0.055)[,c(1:5,15,16,18,19,23)])
+```
+
+
+
+
+
