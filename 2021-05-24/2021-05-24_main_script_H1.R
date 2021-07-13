@@ -18,8 +18,10 @@ source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/esel
 # Differences with respect to previous versions
 ##################################################################################
 
-# - consider sample size reassessment with initial sample size cbe
-# - consider scenarios without sample size reassessment (and initial sample size e1)
+# - consider less scenarios for OR2, p1, p2
+# - add scenarios correlation between components
+# - computation sample size according to E1
+# - adding interim analysis and sample size recalculation
 
 #########################################
 # Preamble
@@ -88,13 +90,6 @@ dataset$decision = ifelse(dataset$ARE<1, "RE", "CE")
 alpha=0.05; beta=0.2
 dataset$samplesize_e1 = mapply(samplesize_OR,p0=dataset$p0_e1, OR=dataset$OR1, alpha=alpha, beta=beta) 
 dataset$samplesize_ce = mapply(samplesize_OR,p0=dataset$p0_ce, OR=dataset$OR_ce, alpha=alpha, beta=beta) 
-dataset$samplesize_ce0 = mapply(samplesize_cbe,p0_e1=dataset$p0_e1,p0_e2=dataset$p0_e2,
-                                eff_e1 = dataset$OR1,
-                                effm_e1 = "or",
-                                eff_e2 = dataset$OR2,
-                                effm_e2 = "or",
-                                effm_ce = "or",
-                                rho=0, alpha=alpha, beta=beta) 
 
 dataset$ss_ratio = dataset$samplesize_e1/dataset$samplesize_ce
 dataset$ss_decision = ifelse(dataset$ss_ratio<1, "RE", "CE") 
@@ -137,11 +132,6 @@ z.beta <-  qnorm(1-beta,0,1)
 
 #########################################
 # Simulation under H1
-# with sample size reassessment
-#########################################
-
-#########################################
-# Simulation under H1
 #########################################
 
 t0=Sys.time() 
@@ -149,35 +139,32 @@ t0=Sys.time()
 #  COMPOSITE and RELEVANT ENDPOINT - Powers (for comparison)
 
 for(i in 1:dim(dataset)[1]){
-  dataset$Test_Power_CE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_ce0[i]/2,dataset$p0_ce[i],dataset$p1_ce[i]))< - z.alpha)/nsim
-  dataset$Test_Power_RE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_ce0[i]/2,dataset$p0_e1[i],dataset$p1_e1[i]))< - z.alpha)/nsim
+  dataset$Test_Power_CE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_e1[i]/2,dataset$p0_ce[i],dataset$p1_ce[i]))< - z.alpha)/nsim
+  dataset$Test_Power_RE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_e1[i]/2,dataset$p0_e1[i],dataset$p1_e1[i]))< - z.alpha)/nsim
   print(i)
 }
-
-set.seed(2413)
 
 #  ENDPOINT SELECTION - Blinded approach 
 
 for(i in 1:dim(dataset)[1]){
-  aux <- rowSums(replicate(nsim,eselectsim(ss_arm=round(dataset$samplesize_ce0[i]/2),
-                                           p0_e1=dataset$p0_e1[i],OR1=dataset$OR1[i],
-                                           p0_e2=dataset$p0_e2[i],OR2=dataset$OR2[i],
-                                           p0_ce=dataset$p0_ce[i],p_init=dataset$p_init[i],criteria="SS"))< c(-z.alpha,1))/nsim 
+  aux <- rowSums(replicate(nsim,eselectsim(ss_arm=round(dataset$samplesize_e1[i]/2),
+                                            p0_e1=dataset$p0_e1[i],OR1=dataset$OR1[i],
+                                            p0_e2=dataset$p0_e2[i],OR2=dataset$OR2[i],
+                                            p0_ce=dataset$p0_ce[i],p_init=dataset$p_init[i],criteria="SS"))< c(-z.alpha,1))/nsim 
   
   
   dataset$Test_Power_ES_SS[i]<- aux[1]
   dataset$decision_ES_SS[i]<- 1-aux[2]
   print(i)
 } 
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False_withss.RData") 
 
 #  ENDPOINT SELECTION - Unblinded approach  
 
 for(i in 1:dim(dataset)[1]){
-  aux <- rowSums(replicate(nsim,eselectsim_ub(ss_arm=round(dataset$samplesize_ce0[i]/2),
-                                              p0_e1=dataset$p0_e1[i],OR1=dataset$OR1[i],
-                                              p0_e2=dataset$p0_e2[i],OR2=dataset$OR2[i],
-                                              p0_ce=dataset$p0_ce[i],p_init=dataset$p_init[i],criteria="SS"))< c(-z.alpha,1))/nsim 
+  aux <- rowSums(replicate(nsim,eselectsim_ub(ss_arm=round(dataset$samplesize_e1[i]/2),
+                                           p0_e1=dataset$p0_e1[i],OR1=dataset$OR1[i],
+                                           p0_e2=dataset$p0_e2[i],OR2=dataset$OR2[i],
+                                           p0_ce=dataset$p0_ce[i],p_init=dataset$p_init[i],criteria="SS"))< c(-z.alpha,1))/nsim 
   
   
   dataset$Test_Power_ES_ubSS[i]<- aux[1]
@@ -186,7 +173,7 @@ for(i in 1:dim(dataset)[1]){
 }
 
 t1=Sys.time()-t0  
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False_withss.RData") 
+save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False.RData") 
 
 
 #########################################   
@@ -288,55 +275,3 @@ for(i in 1:dim(dataset)[1]){
 
 t1=Sys.time()-t0  
 save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0True_e1.RData") 
-
-
-#########################################
-# Simulation under H1 
-# - wihtout sample size reassessment  
-#########################################
-
-set.seed(5532)
-
-t0=Sys.time() 
-
-#  COMPOSITE and RELEVANT ENDPOINT - Powers (for comparison)
-
-for(i in 1:dim(dataset)[1]){
-  dataset$Test_Power_CE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_e1[i]/2,dataset$p0_ce[i],dataset$p1_ce[i]))< - z.alpha)/nsim
-  dataset$Test_Power_RE[i] <- sum(replicate(nsim,f_OR(dataset$samplesize_e1[i]/2,dataset$p0_e1[i],dataset$p1_e1[i]))< - z.alpha)/nsim
-  print(i)
-}
-
-#  ENDPOINT SELECTION - Blinded approach 
-
-for(i in 1:dim(dataset)[1]){
-  aux <- rowSums(replicate(nsim,eselectsim(ss_arm=round(dataset$samplesize_e1[i]/2),
-                                           p0_e1=dataset$p0_e1[i],OR1=dataset$OR1[i],
-                                           p0_e2=dataset$p0_e2[i],OR2=dataset$OR2[i],
-                                           p0_ce=dataset$p0_ce[i],p_init=dataset$p_init[i],criteria="SS",SS_r=FALSE))< c(-z.alpha,1))/nsim 
-  
-  
-  dataset$Test_Power_ES_SS[i]<- aux[1]
-  dataset$decision_ES_SS[i]<- 1-aux[2]
-  print(i)
-} 
-
-#  ENDPOINT SELECTION - Unblinded approach  
-
-for(i in 1:dim(dataset)[1]){
-  aux <- rowSums(replicate(nsim,eselectsim_ub(ss_arm=round(dataset$samplesize_e1[i]/2),
-                                              p0_e1=dataset$p0_e1[i],OR1=dataset$OR1[i],
-                                              p0_e2=dataset$p0_e2[i],OR2=dataset$OR2[i],
-                                              p0_ce=dataset$p0_ce[i],p_init=dataset$p_init[i],criteria="SS",SS_r=FALSE))< c(-z.alpha,1))/nsim 
-  
-  
-  dataset$Test_Power_ES_ubSS[i]<- aux[1]
-  dataset$decision_ES_ubSS[i]<- 1-aux[2]
-  print(i)
-}
-
-t1=Sys.time()-t0  
-save.image("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/results/results_H0False_withoutss.RData") 
-
-
-
