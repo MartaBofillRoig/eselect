@@ -6,9 +6,17 @@ This repository contains the R package and main code to reproduce the results in
 In this work, we consider two-arm randomized controlled trials with a primary composite binary endpoint and an endpoint that consists only of the clinically more important component of the composite endpoint. We propose a trial design that allows an adaptive modification of the primary endpoint based on blinded information obtained at an interim analysis.
 
 
-## R-package ``eselect''
+## R-package **eselect**
 
-Functions:
+You can install the development version of the the R package from GitHub:
+
+``` r
+# install.packages("devtools")
+library(devtools)
+install_github("MartaBofillRoig/eselect")
+```
+
+The R package contains the following functions:
 
 - eselect: Endpoint selection and sample size reassessment for composite endpoints based on blinded data
 
@@ -21,7 +29,8 @@ binary endpoints based on blinded data
 
 - eselect_ub: Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
 
-## R-package ``eselect''
+
+## References
 
 This repository also contains the source files of the preprint (XXX). Specifically, 
 
