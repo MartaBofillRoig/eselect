@@ -7,3 +7,23 @@ In this work, we consider two-arm randomized controlled trials with a primary co
 
 
 ## R-package ``eselect''
+
+Functions:
+
+- eselect: Endpoint selection and sample size reassessment for composite endpoints based on blinded data
+
+- eselectme: Endpoint selection and sample size reassessment for multiple
+binary endpoints based on blinded data
+
+- eselectsim: Simulation trials with endpoint selection and sample size reassessment for composite endpoints based on blinded data
+
+- eselectsim_ub: Simulation trials with endpoint selection and sample size reassessment for composite endpoints based on unblinded data
+
+- eselect_ub: Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
+
+## R-package ``eselect''
+
+This repository also contains the source files of the preprint (XXX). Specifically, 
+
+- In the folder CODE_paper/Example, there is the source code for reproduce the illustration; 
+- In the folder CODE_paper/Simulations, there is the code to reproduce the simulation study in the paper.
