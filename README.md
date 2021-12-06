@@ -34,5 +34,5 @@ binary endpoints based on blinded data
 
 This repository also contains the source files of the preprint (XXX). Specifically, 
 
-- In the folder CODE_paper/Example, there is the source code for reproduce the illustration; 
-- In the folder CODE_paper/Simulations, there is the code to reproduce the simulation study in the paper.
+- In the folder CODE_paper/example, there is the source code for reproduce the illustration; 
+- In the folder CODE_paper/simulations, there is the code to reproduce the simulation study in the paper.
