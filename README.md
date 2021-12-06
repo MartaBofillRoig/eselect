@@ -30,7 +30,7 @@ binary endpoints based on blinded data
 - eselect_ub: Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
 
 
-## References
+## Reproducible research
 
 This repository also contains the source files of the preprint (XXX). Specifically, 
 
