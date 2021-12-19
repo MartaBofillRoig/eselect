@@ -97,6 +97,15 @@ upper_corr(p_e1=p0_ce1_corr, p_e2=p0_e3)
 prob_cbe(p_e1=p0_ce1, p_e2=p0_e3, rho=0)
 prob_cbe(p_e1=p0_ce1_corr, p_e2=p0_e3, rho=0)
 
+OR_mape = effectsize_cbe(p0_e1=p0_ce1, p0_e2=p0_e3,  
+                        eff_e1=OR_ce1,
+                        effm_e1 = "or",
+                        eff_e2=OR3,
+                        effm_e2 = "or",
+                        effm_ce = "or",
+                        rho=0
+)$`Effect CE`
+
 rho=c(0,0.1,0.2,0.3,0.4)
 
 ss_cbe <- mapply(samplesize_cbe, p0_e1=p0_ce1,
