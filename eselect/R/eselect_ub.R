@@ -28,6 +28,30 @@
 
 eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",alpha=0.05,beta=0.2){
 
+
+  if(is.table(db0)==F || (dim(db0)==c(3,3))=c(F,F) || is.numeric(db0)==F){
+    stop("The table must be a matrix 2x2 table")
+  }else if(is.table(db1)==F || (dim(db1)==c(3,3))=c(F,F) || is.numeric(db1)==F){
+    stop("The table must be a matrix 2x2 table")
+  }else if(p0_e1 < 0 || p0_e1 > 1){
+    stop("The probability of observing the event E1 (p_e1) must be number between 0 and 1")
+  }else if(p0_e2 < 0 || p0_e2 > 1){
+    stop("The probability of observing the event E2 (p_e2) must be number between 0 and 1")
+  }else if(OR1 < 0 || OR1 >= 1){
+    stop("The odds ratio (OR1) must be number between 0 and 1")
+  }else if(OR2 < 0 || OR2 >= 1){
+    stop("The odds ratio (OR2) must be number between 0 and 1")
+  }else if(criteria != "SS" && criteria != "ARE"){
+    stop("You have to choose between sample size (SS) or Asymptotic Relative Efficiency (ARE)")
+  }else if( 0 > alpha || alpha > 1){
+    stop("Alpha value must be number between 0 and 1")
+  }else if( 0 > beta || beta > 1){
+    stop("Beta value must be number between 0 and 1")
+  }
+
+  #
+
+
   samplesize = sum(db0)
   total_ss = 2*samplesize
 
