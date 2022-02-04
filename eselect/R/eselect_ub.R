@@ -29,9 +29,9 @@
 eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",alpha=0.05,beta=0.2){
 
 
-  if(is.table(db0)==F || (dim(db0)==c(3,3))=c(F,F) || is.numeric(db0)==F){
+  if(is.table(db0)==F || (dim(db0)==c(3,3))==c(F,F) || is.numeric(db0)==F){
     stop("The table must be a matrix 2x2 table")
-  }else if(is.table(db1)==F || (dim(db1)==c(3,3))=c(F,F) || is.numeric(db1)==F){
+  }else if(is.table(db1)==F || (dim(db1)==c(3,3))==c(F,F) || is.numeric(db1)==F){
     stop("The table must be a matrix 2x2 table")
   }else if(p0_e1 < 0 || p0_e1 > 1){
     stop("The probability of observing the event E1 (p_e1) must be number between 0 and 1")

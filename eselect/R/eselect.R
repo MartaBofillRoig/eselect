@@ -27,7 +27,7 @@
 
 eselect <- function(db,p0_e1,OR1,p0_e2,OR2,criteria="SS",alpha=0.05,beta=0.2){
 
-  if(is.table(db)==F || (dim(db)==c(3,3))=c(F,F) || is.numeric(db)==F){
+  if(is.table(db)==F || (dim(db)==c(3,3))==c(F,F) || is.numeric(db)==F){
     stop("The table must be a matrix 2x2 table")
   }else if(p0_e1 < 0 || p0_e1 > 1){
     stop("The probability of observing the event E1 (p_e1) must be number between 0 and 1")

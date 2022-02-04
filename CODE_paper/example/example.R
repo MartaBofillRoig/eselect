@@ -12,7 +12,7 @@ library(tidyverse)
 library(gridExtra)
 
 setwd("C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection")
-source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/aux_functions.R') 
+source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/CODE_paper/simulations/aux_functions.R')
 source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect.R')
 source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselectsim.R') 
 source('C:/Users/mbofi/Dropbox/C5/Scripts/GitKraken/CBE_selection/eselect/R/eselect_ub.R')
