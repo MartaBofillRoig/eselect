@@ -81,7 +81,7 @@ power_data <- data.frame(Power=c(dataset_H0False_ss$Test_Power_ES_SS,dataset_H0F
                                     rep("RD",length(dataset_H0False_ss$Test_Power_RE)))
 )
 ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot()
-ggsave("power_H0False_withssunblinded.pdf",width = 100, height = 100, units = "mm")
+# ggsave("power_H0False_withssunblinded.pdf",width = 100, height = 100, units = "mm")
 
 # plot without unblinded 
 power_data_blinded <- data.frame(Power=c(dataset_H0False_ss$Test_Power_ES_SS,
@@ -93,7 +93,7 @@ power_data_blinded <- data.frame(Power=c(dataset_H0False_ss$Test_Power_ES_SS,
                                     rep("RD",length(dataset_H0False_ss$Test_Power_RE)))
 )
 ggplot(power_data_blinded, aes(x=Design, y=Power)) + geom_boxplot()
-ggsave("power_H0False_withss.pdf",width = 100, height = 100, units = "mm")
+# ggsave("power_H0False_withss.pdf",width = 100, height = 100, units = "mm")
 
 ################################################################################## 
 p <- list() 
@@ -108,16 +108,16 @@ for(i in 1:max(dataset_H0False_ss$scenario)){
   
   # 
   p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
   # + theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
   
   p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
   # + theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2)) 
   
   #
   p[[enum+2]] <- ggplot(univ, aes(x=corr, y=test, color=as.factor(testind)))+
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (CD/RD)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom",#legend.position = c(0.8, 0.2),
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (CD/RD)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom",#legend.position = c(0.8, 0.2),
                   legend.title = element_text(size = 6), legend.text = element_text(size = 6))
   
   # stable <- data.frame(Corr=sub$corr, 
@@ -132,8 +132,8 @@ for(i in 1:max(dataset_H0False_ss$scenario)){
   it <- it + dim(subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i))
 }
 plot <- marrangeGrob(p,ncol=3,nrow=4,top=NULL) 
-ggsave(file="results_ss.pdf", plot, width = 210, height = 297, units = "mm") 
-
+# ggsave(file="results_ss.pdf", plot, width = 210, height = 297, units = "mm") 
+ggsave(file="results_ss2.pdf", plot, width = 210, height = 297, units = "mm") 
 # 
 ################################################################################## 
 p <- list() 
@@ -203,7 +203,7 @@ power_data <- data.frame(Power=c(dataset_H0False_ss$Test_Power_ES_SS,dataset_H0F
 )
 
 ggplot(power_data, aes(x=Endpoint, y=Power)) + geom_boxplot()
-ggsave("power_H0False_withoutssunblinded.pdf",width = 100, height = 100, units = "mm")
+# ggsave("power_H0False_withoutssunblinded.pdf",width = 100, height = 100, units = "mm")
 
 # plot without unblinded 
 power_data_blinded <- data.frame(Power=c(dataset_H0False_ss$Test_Power_ES_SS,
@@ -215,7 +215,7 @@ power_data_blinded <- data.frame(Power=c(dataset_H0False_ss$Test_Power_ES_SS,
                                             rep("RD",length(dataset_H0False_ss$Test_Power_RE)))
 )
 ggplot(power_data_blinded, aes(x=Design, y=Power)) + geom_boxplot()
-ggsave("power_H0False_withoutss.pdf",width = 100, height = 100, units = "mm")
+# ggsave("power_H0False_withoutss.pdf",width = 100, height = 100, units = "mm")
 
 ################################################################################## 
 p <- list() 
@@ -230,21 +230,25 @@ for(i in 1:max(dataset_H0False_ss$scenario)){
   
   # 
   p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS, color=as.factor(ss_decision)))  +
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
   # + theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2))
   
   p[[enum+1]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_ubSS, color=as.factor(ss_decision)))  +
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD, unblinded)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
   # + theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2)) 
   
   #
   p[[enum+2]] <- ggplot(univ, aes(x=corr, y=test, color=as.factor(testind)))+
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (CD/RD)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.60, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom",#legend.position = c(0.8, 0.2),
+    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (CD/RD)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom",#legend.position = c(0.8, 0.2),
                                                                                                                                                                                                                                                                                                                                                                                                       legend.title = element_text(size = 6), legend.text = element_text(size = 6))
   
-  stable <- data.frame(Corr=sub$corr, 
-                       SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
-                       "%CE(u)"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)  
+  
+  stable <- data.frame("Correlation"=sub$corr, 
+                       "Decision rule"=round(sub$ss_ratio,2),"% CE"=round(100*sub$decision_ES_SS,2),check.names=FALSE)  
+  
+  # stable <- data.frame(Corr=sub$corr, 
+  #                      SS=round(sub$ss_ratio,2),"%CE"=round(100*sub$decision_ES_SS,2),
+  #                      "%CE(u)"=round(100*sub$decision_ES_ubSS,2),check.names=FALSE)  
   
   p[[enum+3]] <- ggtexttable(stable, rows = NULL, theme = ttheme(base_style = "default", base_size = 9))
   
@@ -252,7 +256,8 @@ for(i in 1:max(dataset_H0False_ss$scenario)){
   it <- it + dim(subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i))
 }
 plot <- marrangeGrob(p,ncol=3,nrow=4,top=NULL) 
-ggsave(file="results_withoutss.pdf", plot, width = 210, height = 297, units = "mm") 
+# ggsave(file="results_withoutss.pdf", plot, width = 210, height = 297, units = "mm") 
+ggsave(file="results_withoutss2.pdf", plot, width = 210, height = 297, units = "mm") 
 
 ################################################################################## 
 p <- list() 
