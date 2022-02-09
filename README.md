@@ -20,14 +20,11 @@ The R package contains the following functions:
 
 - eselect: Endpoint selection and sample size reassessment for composite endpoints based on blinded data
 
-- eselectme: Endpoint selection and sample size reassessment for multiple
-binary endpoints based on blinded data
+- eselect_ub: Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
 
 - eselectsim: Simulation trials with endpoint selection and sample size reassessment for composite endpoints based on blinded data
 
 - eselectsim_ub: Simulation trials with endpoint selection and sample size reassessment for composite endpoints based on unblinded data
-
-- eselect_ub: Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
 
 
 ## Reproducible research

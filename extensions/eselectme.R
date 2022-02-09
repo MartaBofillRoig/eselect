@@ -11,7 +11,9 @@
 #' @param alpha Type I error.
 #' @param beta Type II error.
 #'
+#' @keywords internal
 #' @export
+#' @import CompAREdesign
 #'
 #' @return This function returns the decision (Decision = 2, meaning the chosen endpoint is the multiple endpoints approach; Decision = 1, meaning the chosen endpoint is the composite endpoint; and Decision = 0, meaning the chosen endpoint is the relevant endpoint) and the sample size according to the decision.
 #'
@@ -27,7 +29,9 @@
 eselectme <- function(db,p0_e1,OR1,p0_e2,OR2,alpha=0.05,beta=0.2){
 
 
-  if(is.table(db)==F || (dim(db)==c(3,3))=c(F,F) || is.numeric(db)==F){
+  requireNamespace("CompAREdesign")
+
+  if(is.table(db)==F || (dim(db)==c(3,3))==c(F,F) || is.numeric(db)==F){
     stop("The table must be a matrix 2x2 table")
   }else if(p0_e1 < 0 || p0_e1 > 1){
     stop("The probability of observing the event E1 (p_e1) must be number between 0 and 1")
@@ -133,5 +137,7 @@ eselectme <- function(db,p0_e1,OR1,p0_e2,OR2,alpha=0.05,beta=0.2){
 
   return(list(SampleSize = total_ss, Decision = Decision))
 }
+
+
 
 

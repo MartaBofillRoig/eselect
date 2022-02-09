@@ -1,7 +1,7 @@
 #' Endpoint selection and sample size reassessment for composite endpoints based on unblinded data
 #'
 #' @description Endpoint selection and sample size reassessment for composite endpoints based on unblinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function selects between the composite endpoint or the relevant endpoint as the primary endpoint of the study and recalculate the sample size accordingly. The decision criteria to decide between the composite endpoint or the relevant endpoint might be the ratio of the corresponding sample sizes ("SS") or the Asymptotic Relative Efficiency ("ARE").
-#' The algorithm of the function is the following: First, the probabilities of the composite components in the control group and the correlation between them is estimated based on unblinded data. Second, using the estimated probabilities and the estimated correlation, the decision criteria is computed and the primary endpoint is selected.  Finally, the sample size is recalculated according to the decision.
+#' The algorithm of the function is the following: First, the probabilities of the composite components in the control group and the correlation between them are estimated based on unblinded data. Second, using the estimated probabilities and the estimated correlation, the decision criteria is computed and the primary endpoint is selected.  Finally, the sample size is recalculated according to the decision.
 #'
 #' @param db0 matrix
 #' @param db1 matrix
@@ -14,12 +14,11 @@
 #' @param beta Type II error.
 #'
 #' @export
+#' @import CompAREdesign
 #'
 #' @return This function returns the decision (Decision = 1, meaning the chosen endpoint is the composite endpoint; and Decision = 0, meaning the chosen endpoint is the relevant endpoint) and the sample size according to the decision.
 #'
-#' @details
 #'
-#' @references
 #'
 
 
@@ -28,6 +27,7 @@
 
 eselect_ub <- function(db0,db1,p0_e1,OR1,p0_e2,OR2,criteria="SS",alpha=0.05,beta=0.2){
 
+  requireNamespace("CompAREdesign")
 
   if(is.table(db0)==F || (dim(db0)==c(3,3))==c(F,F) || is.numeric(db0)==F){
     stop("The table must be a matrix 2x2 table")

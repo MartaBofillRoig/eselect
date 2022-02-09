@@ -31,6 +31,8 @@ eselectsim(
 
 \item{OR2}{numeric parameter, Odds ratio for the endpoint 2}
 
+\item{p0_ce}{numeric parameter, probability of occurrence composite endpoint in the control group}
+
 \item{p_init}{numeric parameter, percentage of sample size used in the interim}
 
 \item{criteria}{decision criteria to choose between the composite endpoint or the endpoint 1 as primary endpoint ("SS": Ratio sample sizes, "ARE": Asymptotic Relative Efficiency).}
@@ -50,10 +52,4 @@ This function returns the decision (Decision = 1, meaning the chosen endpoint is
 }
 \description{
 This function simulates trials with endpoint selection and sample size reassessment  for composite binary endpoints based on blinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function simulates a trial based on the design parameters and use the algorithm implemented in eselect() to select the primary endpoint and recalculate the sample size accordingly.
-}
-\details{
-
-}
-\references{
-
 }

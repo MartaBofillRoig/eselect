@@ -5,6 +5,7 @@
 #' @param ss_arm numeric parameter, sample size per arm
 #' @param p0_e1 numeric parameter, probability of occurrence E1 in the control group
 #' @param p0_e2 numeric parameter, probability of occurrence E2 in the control group
+#' @param p0_ce numeric parameter, probability of occurrence composite endpoint in the control group
 #' @param OR1 numeric parameter, Odds ratio for the endpoint 1
 #' @param OR2 numeric parameter, Odds ratio for the endpoint 2
 #' @param p_init numeric parameter, percentage of sample size used in the interim
@@ -16,12 +17,11 @@
 #' @param beta Type II error.
 #'
 #' @export
+#' @import CompAREdesign
 #'
 #' @return This function returns the decision (Decision = 1, meaning the chosen endpoint is the composite endpoint; and Decision = 0, meaning the chosen endpoint is the relevant endpoint) and the statistic to test the primary hypothesis according to the decision.
 #'
-#' @details
 #'
-#' @references
 #'
 
 ##############################################################
@@ -33,6 +33,8 @@
 # computation statistic according to the decision (based on SS)
 
 eselectsim <- function(ss_arm,p0_e1,OR1,p0_e2,OR2,p0_ce,p_init=1,criteria="SS",H0_e1=FALSE,H0_e2=FALSE,SS_r=TRUE,alpha=0.05,beta=0.2){
+
+  requireNamespace("CompAREdesign")
 
   n_init=ss_arm
   ss_arm=round(n_init*p_init)
