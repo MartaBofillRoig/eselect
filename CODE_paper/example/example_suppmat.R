@@ -54,21 +54,21 @@ eselect(db=data,p0_e1=0.18,OR1=0.70,p0_e2=0.05,OR2=0.9,criteria="SS",alpha=0.05,
 
 # Simulations considering different correlation values
 # eselect
-set.seed(5234)
+set.seed(4523)
 rho=c(0,0.1,0.2,0.3,0.4,0.5) 
 (p0_ce = prob_cbe(p_e1=0.18, p_e2=0.05, rho=rho))
 
-eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.90, p0_ce=p0_ce[1], p_init = 1, alpha = 0.05, beta = 0.2)
+eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.90, p0_ce=p0_ce[1], p_init = 1, alpha = 0.05, beta = 0.2, SS_r=F)
 
-eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.90, p0_ce=p0_ce[3], p_init = 1, alpha = 0.05, beta = 0.2)
+eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.90, p0_ce=p0_ce[3], p_init = 1, alpha = 0.05, beta = 0.2, SS_r=F)
 
-eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.90, p0_ce=p0_ce[4], p_init = 1, alpha = 0.05, beta = 0.2)
+eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.90, p0_ce=p0_ce[4], p_init = 1, alpha = 0.05, beta = 0.2, SS_r=F)
 
-eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.80, p0_ce=p0_ce[1], p_init = 1, alpha = 0.05, beta = 0.2)
+eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.80, p0_ce=p0_ce[1], p_init = 1, alpha = 0.05, beta = 0.2, SS_r=F)
 
-eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.80, p0_ce=p0_ce[3], p_init = 1, alpha = 0.05, beta = 0.2)
+eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.80, p0_ce=p0_ce[3], p_init = 1, alpha = 0.05, beta = 0.2, SS_r=F)
 
-eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.80, p0_ce=p0_ce[4], p_init = 1, alpha = 0.05, beta = 0.2)
+eselectsim(ss_arm=n/2, p0_e1=0.18, OR1=OR1, p0_e2=0.05, OR2=0.80, p0_ce=p0_ce[4], p_init = 1, alpha = 0.05, beta = 0.2, SS_r=F)
 
 
 
