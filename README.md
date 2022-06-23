@@ -1,4 +1,4 @@
-# Adaptive trial designs with selection of composite endpoints and sample size reassessment
+# Adaptive trial designs with blinded selection of composite endpoints and sample size reassessment
 
 This repository contains the R package and main code to reproduce the results in [Adaptive clinical trial designs with selection of composite endpoints and sample size reassessment](https://arxiv.org/abs/2206.09639) by M. Bofill Roig,  G. Gómez, M. Posch and F. Koenig.
 
