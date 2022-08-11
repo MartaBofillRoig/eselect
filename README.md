@@ -7,7 +7,7 @@ In this work, we consider two-arm randomized controlled trials with a primary co
 
 ## R-package **eselect**
 
-You can install the development version of the R package from GitHub:
+You can install the R package from GitHub using the following code:
 
 ``` r
 # install.packages("devtools")
@@ -28,7 +28,7 @@ The R package contains the following functions:
 
 ## Reproducible research
 
-This repository also contains the source files of the preprint (XXX). Specifically, 
+This repository also contains the source files of the preprint (https://arxiv.org/abs/2206.09639). Specifically, 
 
 - In the folder CODE_paper/example, there is the source code for reproduce the illustration; 
 - In the folder CODE_paper/simulations, there is the code to reproduce the simulation study in the paper.
