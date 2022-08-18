@@ -273,30 +273,39 @@ p <- list()
 enum = 1 
 it <- 1 
 
-for(i in 1:max(dataset_H0False_ss$scenario)){
-  sub=subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i & dataset_H0False_ss$p_init==1.0) 
-  univ=rbind(sub,sub)
-  univ$testind=c(rep("RE",dim(sub)[1]),rep("CE",dim(sub)[1]))
-  univ$test=ifelse(univ$testind=="RE",univ$Test_Power_RE,univ$Test_Power_CE)
+data_plot = subset(dataset_H0False_ss,dataset_H0False_ss$p_init==1.0) 
+power_data_blinded_plot <- data.frame(Power=c(data_plot$Test_Power_ES_SS, 
+                                              data_plot$Test_Power_CE,data_plot$Test_Power_RE),
+                                 Design=c(rep("AD",length(data_plot$Test_Power_ES_SS)), 
+                                          rep("CD",length(data_plot$Test_Power_CE)),
+                                          rep("RD",length(data_plot$Test_Power_RE))),
+                                 scenario=c(data_plot$scenario,
+                                            data_plot$scenario, data_plot$scenario),
+                                 corr=c(data_plot$corr,
+                                        data_plot$corr, data_plot$corr)
+)
+
+for(i in 1:max(power_data_blinded_plot$scenario)){
+  sub_leg=subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i & dataset_H0False_ss$p_init==1.0) 
+  sub=subset(power_data_blinded_plot,power_data_blinded_plot$scenario==i) 
+  # univ=rbind(sub,sub)
+  # univ$testind=c(rep("RE",dim(sub)[1]),rep("CE",dim(sub)[1]))
+  # univ$test=ifelse(univ$testind=="RE",univ$Test_Power_RE,univ$Test_Power_CE)
   # univ$ss_decision = ifelse(dataset$decision_ES_SS<1, "RE", "CE") 
   # 
-  p[[enum]] <-ggplot(sub, aes(x=corr, y=Test_Power_ES_SS))  +
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
+  # p[[enum]] <-ggplot(sub, aes(x=corr, y=Power))  +
+  #   geom_point(size=2)+ ggtitle(paste("Scenario", sub_leg$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", sub_leg$p0_e1[it],",",sub_leg$p0_e2[it],",",sub_leg$OR1[it],",",sub_leg$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (AD)", x="Correlation", color="Decision SS") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))
   # + theme(plot.title = element_text(size=9),legend.position = c(0.8, 0.2)) 
   
   #
-  p[[enum+1]] <- ggplot(univ, aes(x=corr, y=test, color=as.factor(testind)))+
-    geom_point(size=2)+ ggtitle(paste("Scenario", dataset_H0False_ss$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", dataset_H0False_ss$p0_e1[it],",",dataset_H0False_ss$p0_e2[it],",",dataset_H0False_ss$OR1[it],",",dataset_H0False_ss$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power (CD/RD)", x="Correlation", color="Decision") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom",#legend.position = c(0.8, 0.2),
-                                                                                                                                                                                                                                                                                                                                                                                            legend.title = element_text(size = 6), legend.text = element_text(size = 6))
+  p[[enum]] <- ggplot(sub, aes(x=corr, y=Power, color=as.factor(Design)))+
+    geom_point(size=2)+ ggtitle(paste("Scenario", sub_leg$scenario[it], "\n (p1,p2,OR1,OR2) \n=(", sub_leg$p0_e1[it],",",sub_leg$p0_e2[it],",",sub_leg$OR1[it],",",sub_leg$OR2[it],")"))+geom_point(size=2)  + labs(y = "Power", x="Correlation in the treatment arm", color="Design") + coord_cartesian(ylim = c(0.40, 1))+ geom_path()+ theme(plot.title = element_text(size=9),legend.position="bottom", legend.title = element_text(size = 6), legend.text = element_text(size = 6))+ geom_vline(xintercept = 0.2,linetype=2)
   
-  
-  
-  enum=enum+2 
-  it <- it + dim(subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i))
+  enum=enum+1 
+  # it <- it + dim(subset(dataset_H0False_ss,dataset_H0False_ss$scenario==i))
 }
-plot <- marrangeGrob(p,ncol=2,nrow=2,top=NULL) 
-# ggsave(file="results_withoutss.pdf", plot, width = 210, height = 297, units = "mm") 
-ggsave(file="results_diffcorr.pdf", plot, width = 210, height = 297, units = "mm") 
+plot <- marrangeGrob(p,ncol=2,nrow=1,top=NULL)  
+ggsave(file="results_diffcorr.pdf", plot, width = 210, height = 155, units = "mm") 
 
 
 ##################################################################################### 
