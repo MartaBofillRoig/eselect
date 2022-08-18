@@ -23,6 +23,27 @@ load("H:/Code_PAPER_biost/results/results_H0True.RData")
 # load("~/Code_PAPER_biost/results/results_H0True.RData") 
 dataset_H0True = dataset 
 
+##################################################################################
+# Maximum type 1 error inflation
+
+summary(dataset_H0True)
+
+alpha=0.05
+nsim=100000
+(sd=sqrt(alpha*(1-alpha)/nsim))
+z.alpha <- qnorm(1-alpha/2,0,1)
+round(c(alpha-z.alpha*sd,alpha+z.alpha*sd),4)
+
+dim(dataset_H0True)[1]-sum((dataset_H0True$Test_Reject_ES_SS>round(c(alpha-z.alpha*sd,alpha+z.alpha*sd),4)[2]))
+sum((dataset_H0True$Test_Reject_ES_SS>round(c(alpha-z.alpha*sd,alpha+z.alpha*sd),4)[2]))
+
+236/242
+1-236/242
+242-236 
+
+##################################################################################
+# Plots
+
 names(dataset_H0True)[names(dataset_H0True)=="Test_Power_ES"] <- 'Test_Reject_ES'
 names(dataset_H0True)[names(dataset_H0True)=="Test_Power_ES_SS"] <- 'Test_Reject_ES_SS'
 names(dataset_H0True)[names(dataset_H0True)=="Test_Power_ES_ub"] <- 'Test_Reject_ES_ub'
