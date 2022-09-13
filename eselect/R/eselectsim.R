@@ -18,7 +18,7 @@
 #'
 #' @export
 #' @import CompAREdesign
-#'
+#' @references Bofill Roig, M., Gómez Melis, G., Posch, M., & Koenig, F. (2022). Adaptive clinical trial designs with blinded selection of binary composite endpoints and sample size reassessment. Biostatistics (in press). arXiv e-prints, arXiv-2206 (https://doi.org/10.48550/arXiv.2206.09639).
 #' @return This function returns the decision (Decision = 1, meaning the chosen endpoint is the composite endpoint; and Decision = 0, meaning the chosen endpoint is the relevant endpoint) and the statistic to test the primary hypothesis according to the decision.
 #'
 #'

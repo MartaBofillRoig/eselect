@@ -53,3 +53,6 @@ This function returns the decision (Decision = 1, meaning the chosen endpoint is
 \description{
 This function simulates trials with endpoint selection and sample size reassessment  for composite binary endpoints based on blinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function simulates a trial based on the design parameters and use the algorithm implemented in eselect() to select the primary endpoint and recalculate the sample size accordingly.
 }
+\references{
+Bofill Roig, M., Gómez Melis, G., Posch, M., & Koenig, F. (2022). Adaptive clinical trial designs with blinded selection of binary composite endpoints and sample size reassessment. Biostatistics (in press). arXiv e-prints, arXiv-2206 (https://doi.org/10.48550/arXiv.2206.09639).
+}

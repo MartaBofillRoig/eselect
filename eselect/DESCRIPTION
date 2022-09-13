@@ -1,5 +1,5 @@
 Package: eselect
-Title: Endpoint selection and sample size reassessment
+Title: Adaptive clinical trial designs with endpoint selection and sample size reassessment
 Version: 1.1
 Authors: Marta Bofill Roig [aut,cre], Guadalupe Gomez Melis [ctb], Franz Koenig [ctb], Martin Posch [ctb]
 Maintainer: Marta Bofill Roig <marta.bofillroig@meduniwien.ac.at>
@@ -28,4 +28,4 @@ Imports:
 	stats,
 	CompAREdesign	
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1

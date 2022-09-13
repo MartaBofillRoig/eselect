@@ -30,3 +30,7 @@ This function returns the decision (Decision = 1, meaning the chosen endpoint is
 Endpoint selection and sample size reassessment for composite endpoints based on blinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function selects between the composite endpoint or the relevant endpoint as the primary endpoint of the study and recalculate the sample size accordingly. The decision criteria to decide between the composite endpoint or the relevant endpoint might be the ratio of the corresponding sample sizes ("SS") or the Asymptotic Relative Efficiency ("ARE").
 The algorithm of the function is the following: First, the probabilities of the composite components in the control group and the correlation between them are estimated based on blinded data. Second, using the estimated probabilities and the estimated correlation, the decision criteria is computed and the primary endpoint is selected.  Finally, the sample size is recalculated according to the decision.
 }
+\references{
+Bofill Roig, M., Gómez Melis, G., Posch, M., & Koenig, F. (2022). Adaptive clinical trial designs with blinded selection of binary composite endpoints and sample size reassessment. Biostatistics (in press). arXiv e-prints, arXiv-2206 (https://doi.org/10.48550/arXiv.2206.09639).
+Bofill Roig, M., & Gómez Melis, G. "Selection of composite binary endpoints in clinical trials." Biometrical Journal 60.2 (2018): 246-261.
+}
