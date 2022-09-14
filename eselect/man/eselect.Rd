@@ -30,6 +30,30 @@ This function returns the decision (Decision = 1, meaning the chosen endpoint is
 Endpoint selection and sample size reassessment for composite endpoints based on blinded data. The composite endpoint is assumed to be a binary endpoint formed by a combination of two events (E1 and E2). We assume that the endpoint 1 is more relevant for the clinical question than endpoint 2. This function selects between the composite endpoint or the relevant endpoint as the primary endpoint of the study and recalculate the sample size accordingly. The decision criteria to decide between the composite endpoint or the relevant endpoint might be the ratio of the corresponding sample sizes ("SS") or the Asymptotic Relative Efficiency ("ARE").
 The algorithm of the function is the following: First, the probabilities of the composite components in the control group and the correlation between them are estimated based on blinded data. Second, using the estimated probabilities and the estimated correlation, the decision criteria is computed and the primary endpoint is selected.  Finally, the sample size is recalculated according to the decision.
 }
+\examples{
+# Based on Bofill Roig, M., et al.
+# (See supplementary material in https://doi.org/10.48550/arXiv.2206.09639)
+p0_e1 = 0.173
+p0_e2 = 0.055
+p1_e1 = 0.121;
+p1_e2 = 0.057;
+n1 = 569
+n0 = 576
+n = n0+n1
+p1 = (p0_e1*n0 + p1_e1*n1)/n
+p2 = (p0_e2*n0 + p1_e2*n1)/n
+p_ce = (0.203*n0 + 0.146*n1)/n
+OR1 = 0.7
+OR2 = 0.9
+x11 = round((p1+p2-p_ce)*n)
+x12 = round((p1)*n-x11)
+x21 = round((p2)*n- x11)
+x22 = round((1-p_ce)*n)
+data = matrix(c(x11,x12,x21,x22), nrow = 2 , ncol = 2, byrow = FALSE)
+eselect(db=data,p0_e1=0.18,OR1=0.70,p0_e2=0.05,OR2=0.9,criteria="SS",alpha=0.05,beta=0.2)
+
+
+}
 \references{
 Bofill Roig, M., Gómez Melis, G., Posch, M., & Koenig, F. (2022). Adaptive clinical trial designs with blinded selection of binary composite endpoints and sample size reassessment. Biostatistics (in press). arXiv e-prints, arXiv-2206 (https://doi.org/10.48550/arXiv.2206.09639).
 Bofill Roig, M., & Gómez Melis, G. "Selection of composite binary endpoints in clinical trials." Biometrical Journal 60.2 (2018): 246-261.
