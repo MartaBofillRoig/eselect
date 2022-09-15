@@ -1,7 +1,18 @@
-##############################################################
-# estimation_b:
-# simulation
-# estimation correlation blinded without previous info corr/CE
+#' Blinded estimation of the correlation
+#'
+#' @description  This function estimates the correlation between two binary endpoints based on blinded data.
+#' @param samplesize numeric parameter, sample size per arm
+#' @param p0_e1 numeric parameter, probability of occurrence E1 in the control group
+#' @param p0_e2 numeric parameter, probability of occurrence E2 in the control group
+#' @param p0_ce numeric parameter, probability of occurrence composite endpoint in the control group
+#' @param p1_e1 numeric parameter, probability of occurrence E1 in the treatment group
+#' @param p1_e2 numeric parameter, probability of occurrence E2 in the treatment group
+#' @param p1_ce numeric parameter, probability of occurrence composite endpoint in the treatment group
+#' @param OR1 numeric parameter, Odds ratio for the endpoint 1 (design)
+#' @param OR2 numeric parameter, Odds ratio for the endpoint 2 (design)
+#' @return This function returns the estimated correlation and the truncated correlation within the possible margins.
+#' @keywords internal
+#' @export
 
 estimation_b <- function(samplesize,p0_e1,p1_e1,OR1,p0_e2,p1_e2,OR2,p0_ce,p1_ce){
   total_ss = samplesize*2
