@@ -3,7 +3,7 @@
 #' @description computes the statistical tests (OR) for two endpoints
 #' @keywords internal
 #' @export
-#'
+#' @value Two-sample test statistics for endpoint 1 and 2
 
 test_me <- function(OR1,p0_e1,OR2,p0_e2,n){
 
