@@ -6,6 +6,9 @@
 \usage{
 f_OR(samplesize, p0, p1)
 }
+\value{
+Two-sample test statistics using unpooled variance estimator
+}
 \description{
 simulates binary outcomes and computes the statistic
 }

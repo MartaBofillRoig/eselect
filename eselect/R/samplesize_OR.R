@@ -3,7 +3,7 @@
 #' @description Sample size calculations in terms of odds ratio
 #' @keywords internal
 #' @export
-#' @value Sample size for odds ratios
+#' @return Sample size for odds ratios
 
 samplesize_OR <- function(p0, OR, alpha=0.05, beta=0.2, Unpooled="Unpooled Variance"){
   z.alpha <- qnorm(1-alpha,0,1)

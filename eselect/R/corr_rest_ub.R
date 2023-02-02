@@ -4,7 +4,7 @@
 #' phat0_e1,phat0_e2,phat1_e1,phat1_e2: estimated probabilities
 #' p0_e1,p0_e2,p1_e1,p1_e2: assumed probabilities (design)
 #' OR1,OR2: expected effect sizes
-#' @value Correlation bounds based on estimated and assumed probabilities (unblinded case)
+#' @return Correlation bounds based on estimated and assumed probabilities (unblinded case)
 #' @keywords internal
 #' @export
 

@@ -3,7 +3,7 @@
 #' @description computes the statistical test (OR)
 #' @keywords internal
 #' @export
-#' @value Two-sample test statistics for a single endpoint
+#' @return Two-sample test statistics for a single endpoint
 
 test_f <- function(OR,p0,n){
 

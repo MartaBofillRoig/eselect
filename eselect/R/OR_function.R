@@ -3,7 +3,7 @@
 #' @description computes the odds ratio
 #' @keywords internal
 #' @export
-#' @value Odds ratio calculation based on marginal probabilities
+#' @return Odds ratio calculation based on marginal probabilities
 
 OR_function<- function(p0, p1){
 

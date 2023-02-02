@@ -6,6 +6,9 @@
 \usage{
 test_f(OR, p0, n)
 }
+\value{
+Two-sample test statistics for a single endpoint
+}
 \description{
 computes the statistical test (OR)
 }

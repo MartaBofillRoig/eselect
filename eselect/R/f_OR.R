@@ -4,7 +4,7 @@
 #' @keywords internal
 #' @export
 #' @import stats
-#' @value Two-sample test statistics using unpooled variance estimator
+#' @return Two-sample test statistics using unpooled variance estimator
 
 f_OR <- function(samplesize,p0,p1){
 

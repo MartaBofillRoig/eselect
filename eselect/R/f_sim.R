@@ -6,7 +6,7 @@
 #' @param p_e2 numeric parameter, probability of occurrence E2
 #' @param p_ce numeric parameter, probability of occurrence composite endpoint
 #' @keywords internal
-#' @value Simlated data
+#' @return Simlated data
 #' @export
 #' @return the function returns 2x2 table
 #' s1+s2: num X1

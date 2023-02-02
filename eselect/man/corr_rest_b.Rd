@@ -6,6 +6,9 @@
 \usage{
 corr_rest_b(phat0_e1, phat0_e2, p0_e1, p0_e2, p1_e1, p1_e2, OR1, OR2)
 }
+\value{
+Correlation bounds based on estimated and assumed probabilities
+}
 \description{
 computes the correlation restrictions
 phat0_e1,phat0_e2: estimated probabilities

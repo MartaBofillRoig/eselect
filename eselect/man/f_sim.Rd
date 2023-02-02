@@ -16,6 +16,8 @@ f_sim(samplesize, p_e1, p_e2, p_ce)
 \item{p_ce}{numeric parameter, probability of occurrence composite endpoint}
 }
 \value{
+Simlated data
+
 the function returns 2x2 table
 s1+s2: num X1
 s1+s3: num X2

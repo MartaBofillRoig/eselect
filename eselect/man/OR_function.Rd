@@ -6,6 +6,9 @@
 \usage{
 OR_function(p0, p1)
 }
+\value{
+Odds ratio calculation based on marginal probabilities
+}
 \description{
 computes the odds ratio
 }

@@ -17,6 +17,9 @@ corr_rest_ub(
   OR2
 )
 }
+\value{
+Correlation bounds based on estimated and assumed probabilities (unblinded case)
+}
 \description{
 computes the correlation restrictions with unblinded data
 phat0_e1,phat0_e2,phat1_e1,phat1_e2: estimated probabilities

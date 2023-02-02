@@ -6,7 +6,7 @@
 #' l: odds ratio
 #' @keywords internal
 #' @export
-#' @value Probability under the control group based on OR and pooled probability
+#' @return Probability under the control group based on OR and pooled probability
 
 
 fun_p0 <- function(p,l){
