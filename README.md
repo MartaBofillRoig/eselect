@@ -1,6 +1,6 @@
 # Adaptive trial designs with blinded selection of composite endpoints and sample size reassessment
 
-This repository contains the R package and main code to reproduce the results in ``Adaptive clinical trial designs with blinded selection of binary composite endpoints and sample size reassessment'' [Paper](https://doi.org/10.1093/biostatistics/kxac040) [Preprint](https://arxiv.org/abs/2206.09639) by M. Bofill Roig,  G. Gómez, M. Posch and F. Koenig.
+This repository contains the R package and main code to reproduce the results in ``Adaptive clinical trial designs with blinded selection of binary composite endpoints and sample size reassessment'' [[Paper]](https://doi.org/10.1093/biostatistics/kxac040) [[Preprint]](https://arxiv.org/abs/2206.09639) by M. Bofill Roig,  G. Gómez, M. Posch and F. Koenig.
 
 In this work, we consider two-arm randomized controlled trials with a primary composite binary endpoint and an endpoint that consists only of the clinically most important component of the composite endpoint. We propose a trial design that allows an adaptive modification of the primary endpoint based on blinded information obtained at an interim analysis.
 
